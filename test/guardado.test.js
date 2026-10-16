@@ -6,6 +6,7 @@ import {
 import {
   resumirPartida, guardarPartida, cargarPartida, borrarPartida,
   restaurarPartida, resumenPartidaGuardada,
+  cargarEstadisticas, registrarResultado, textoContador,
 } from '../src/guardado.js';
 
 function almacenSimulado() {
@@ -111,4 +112,34 @@ test('el resumen de la partida guardada concuerda en número', () => {
     'Tienes este caso a medias: 1 habitación registrada y 0 preguntas hechas.');
   assert.equal(resumenPartidaGuardada({ pistas: [1, 2], respuestas: [1] }),
     'Tienes este caso a medias: 2 habitaciones registradas y 1 pregunta hecha.');
+});
+
+test('las estadísticas empiezan a cero y cuentan partidas jugadas y ganadas', () => {
+  const almacen = almacenSimulado();
+  assert.deepEqual(cargarEstadisticas(almacen), { jugadas: 0, ganadas: 0 });
+  registrarResultado(true, almacen);
+  registrarResultado(false, almacen);
+  assert.deepEqual(registrarResultado(true, almacen), { jugadas: 3, ganadas: 2 });
+  assert.deepEqual(cargarEstadisticas(almacen), { jugadas: 3, ganadas: 2 });
+});
+
+test('borrar la partida no borra las estadísticas', () => {
+  const almacen = almacenSimulado();
+  registrarResultado(true, almacen);
+  borrarPartida(almacen);
+  assert.deepEqual(cargarEstadisticas(almacen), { jugadas: 1, ganadas: 1 });
+});
+
+test('estadísticas dañadas o sin almacenamiento cuentan como cero', () => {
+  const almacen = almacenSimulado();
+  almacen.datos.set('mini-detective:estadisticas', '{"jugadas":"muchas","ganadas":-1}');
+  assert.deepEqual(cargarEstadisticas(almacen), { jugadas: 0, ganadas: 0 });
+  assert.deepEqual(cargarEstadisticas(almacenRoto), { jugadas: 0, ganadas: 0 });
+  assert.deepEqual(registrarResultado(true, almacenRoto), { jugadas: 1, ganadas: 1 });
+});
+
+test('el texto del contador', () => {
+  assert.equal(textoContador({ jugadas: 0, ganadas: 0 }), 'Todavía no has cerrado ningún caso.');
+  assert.equal(textoContador({ jugadas: 1, ganadas: 0 }), 'Casos resueltos: 0 de 1 jugado.');
+  assert.equal(textoContador({ jugadas: 5, ganadas: 3 }), 'Casos resueltos: 3 de 5 jugados.');
 });

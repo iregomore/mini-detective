@@ -1,4 +1,4 @@
-// Guardar y cargar la partida en curso en localStorage.
+// Guardar y cargar la partida en curso y las estadísticas en localStorage.
 // Todo va envuelto en try/catch: si el almacenamiento falla, el juego sigue sin guardar.
 
 import {
@@ -7,6 +7,7 @@ import {
 import { habitaciones, sospechosos, armas, preguntas } from './datos.js';
 
 const CLAVE_PARTIDA = 'mini-detective:partida';
+const CLAVE_ESTADISTICAS = 'mini-detective:estadisticas';
 const VERSION = 1;
 
 function almacenPorDefecto() {
@@ -110,4 +111,23 @@ export function resumenPartidaGuardada(cuaderno) {
   const habitacionesRegistradas = plural(cuaderno.pistas.length, 'habitación registrada', 'habitaciones registradas');
   const preguntasHechas = plural(cuaderno.respuestas.length, 'pregunta hecha', 'preguntas hechas');
   return `Tienes este caso a medias: ${habitacionesRegistradas} y ${preguntasHechas}.`;
+}
+
+export function cargarEstadisticas(almacen = almacenPorDefecto()) {
+  const datos = leer(almacen, CLAVE_ESTADISTICAS);
+  const jugadas = Number.isInteger(datos?.jugadas) && datos.jugadas >= 0 ? datos.jugadas : 0;
+  const ganadas = Number.isInteger(datos?.ganadas) && datos.ganadas >= 0 ? datos.ganadas : 0;
+  return { jugadas, ganadas: Math.min(ganadas, jugadas) };
+}
+
+export function registrarResultado(gana, almacen = almacenPorDefecto()) {
+  const { jugadas, ganadas } = cargarEstadisticas(almacen);
+  const nuevas = { jugadas: jugadas + 1, ganadas: ganadas + (gana ? 1 : 0) };
+  escribir(almacen, CLAVE_ESTADISTICAS, nuevas);
+  return nuevas;
+}
+
+export function textoContador({ jugadas, ganadas }) {
+  if (jugadas === 0) return 'Todavía no has cerrado ningún caso.';
+  return `Casos resueltos: ${ganadas} de ${jugadas} ${jugadas === 1 ? 'jugado' : 'jugados'}.`;
 }

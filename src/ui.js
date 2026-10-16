@@ -10,6 +10,7 @@ import {
 import {
   resumirPartida, guardarPartida, cargarPartida, borrarPartida,
   restaurarPartida, resumenPartidaGuardada,
+  cargarEstadisticas, registrarResultado, textoContador,
 } from './guardado.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -192,6 +193,7 @@ function pintarAcusacion() {
 function acusar() {
   const { gana, aciertos, relato } = comprobarAcusacion(estado.caso, estado.acusacion);
   borrarPartida();
+  registrarResultado(gana);
   const nombres = {
     culpable: ['Culpable', sospechoso(estado.acusacion.culpable).nombre],
     arma: ['Arma', nombreArma(estado.acusacion.arma)],
@@ -245,16 +247,26 @@ function crearBloqueContinuar() {
   $('#pantalla-inicio h2').after(bloque);
 }
 
+// Contador de partidas ganadas y jugadas, al final de la pantalla de inicio.
+function crearContador() {
+  const contador = document.createElement('p');
+  contador.id = 'contador';
+  contador.className = 'ayuda';
+  $('#pantalla-inicio').append(contador);
+}
+
 function mostrarInicio(hayPartidaGuardada) {
   $('#bloque-continuar').hidden = !hayPartidaGuardada;
   // .boton fija display: block, así que el atributo hidden no bastaría.
   $('#boton-empezar').style.display = hayPartidaGuardada ? 'none' : '';
   if (hayPartidaGuardada) $('#aviso-continuar').textContent = resumenPartidaGuardada(estado.cuaderno);
+  $('#contador').textContent = textoContador(cargarEstadisticas());
   mostrarPantalla('inicio');
 }
 
 function arrancar() {
   crearBloqueContinuar();
+  crearContador();
   const guardada = cargarPartida();
   if (guardada) {
     try {
