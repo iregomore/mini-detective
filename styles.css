@@ -117,3 +117,5 @@ h3 { font-size: 1.1rem; margin: 1em 0 0.5em; color: var(--suave); }
 .boton.elegido { border-color: var(--acento); box-shadow: inset 4px 0 0 var(--acento); }
 
 .boton .marca { float: right; color: var(--suave); font-size: 0.85rem; }
+
+#bloque-preguntas { scroll-margin-top: 110px; }

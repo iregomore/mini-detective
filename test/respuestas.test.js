@@ -43,3 +43,9 @@ test('los inocentes aportan los descartes que no están en las habitaciones', ()
     .filter((id) => caso.respuestas[id].extrano.hechos.length).length;
   assert.equal(enPistas + enTestigos, 6);
 });
+
+test('interrogar devuelve el texto de la respuesta', async () => {
+  const { interrogar } = await import('../src/juego.js');
+  const caso = generarCaso(11);
+  assert.equal(interrogar(caso, 'socio', 'donde'), caso.respuestas.socio.donde.texto);
+});

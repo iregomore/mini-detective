@@ -12,6 +12,7 @@
     <h1>Mini Detective</h1>
     <nav id="navegacion" class="navegacion" hidden>
       <button class="pestana" data-pantalla="mansion">Mansión</button>
+      <button class="pestana" data-pantalla="interrogatorio">Interrogar</button>
     </nav>
   </header>
 
@@ -27,6 +28,17 @@
       <p class="ayuda">Elige una habitación para registrarla.</p>
       <p id="hallazgo" class="texto-caso" hidden></p>
       <div id="lista-habitaciones"></div>
+    </section>
+
+    <section id="pantalla-interrogatorio" class="pantalla" hidden>
+      <h2>Interrogatorio</h2>
+      <p class="ayuda">Elige a un sospechoso.</p>
+      <div id="lista-sospechosos"></div>
+      <div id="bloque-preguntas" hidden>
+        <h3 id="titulo-preguntas"></h3>
+        <p id="respuesta" class="texto-caso" hidden></p>
+        <div id="lista-preguntas"></div>
+      </div>
     </section>
   </main>
 

@@ -261,3 +261,7 @@ export function explorar(caso, habitacion) {
   const pista = caso.pistas[habitacion];
   return pista ? pista.texto : textosPista.nada;
 }
+
+export function interrogar(caso, sospechosoId, preguntaId) {
+  return caso.respuestas[sospechosoId][preguntaId].texto;
+}

@@ -1,10 +1,12 @@
 // Conecta la lógica del juego con la interfaz.
-import { generarCaso, introduccion, explorar, nombreHabitacion } from './juego.js';
-import { habitaciones } from './datos.js';
+import {
+  generarCaso, introduccion, explorar, interrogar, nombreHabitacion,
+} from './juego.js';
+import { habitaciones, sospechosos, preguntas } from './datos.js';
 
 const $ = (selector) => document.querySelector(selector);
 
-const estado = { caso: null, exploradas: new Set() };
+const estado = { caso: null, exploradas: new Set(), sospechoso: null };
 
 function semillaInicial() {
   const deUrl = Number(new URLSearchParams(location.search).get('semilla'));
@@ -65,11 +67,51 @@ function registrar(habitacion) {
   pintarHabitaciones(habitacion);
 }
 
+const presentar = (s) => `${s.nombre}, ${s.rol}`;
+
+function pintarSospechosos() {
+  $('#lista-sospechosos').replaceChildren(...sospechosos.map((s) => {
+    const boton = crearBoton(presentar(s), () => elegirSospechoso(s.id));
+    boton.classList.toggle('elegido', s.id === estado.sospechoso);
+    return boton;
+  }));
+}
+
+function elegirSospechoso(id) {
+  estado.sospechoso = id;
+  const elegido = sospechosos.find((s) => s.id === id);
+  $('#titulo-preguntas').textContent = `Preguntas para ${presentar(elegido)}`;
+  $('#respuesta').hidden = true;
+  $('#bloque-preguntas').hidden = false;
+  pintarSospechosos();
+  pintarPreguntas();
+  $('#bloque-preguntas').scrollIntoView({ behavior: 'smooth' });
+}
+
+function pintarPreguntas(elegida) {
+  $('#lista-preguntas').replaceChildren(...preguntas.map((p) => {
+    const boton = crearBoton(p.texto, () => preguntar(p.id));
+    boton.classList.toggle('elegido', p.id === elegida);
+    return boton;
+  }));
+}
+
+function preguntar(pregunta) {
+  const nombre = sospechosos.find((s) => s.id === estado.sospechoso).nombre;
+  const respuesta = $('#respuesta');
+  respuesta.replaceChildren(titular(nombre), `«${interrogar(estado.caso, estado.sospechoso, pregunta)}»`);
+  respuesta.hidden = false;
+  pintarPreguntas(pregunta);
+}
+
 function nuevaPartida(semilla) {
   estado.caso = generarCaso(semilla);
   estado.exploradas = new Set();
   $('#hallazgo').hidden = true;
   pintarHabitaciones();
+  estado.sospechoso = null;
+  $('#bloque-preguntas').hidden = true;
+  pintarSospechosos();
   $('#introduccion').textContent = introduccion(estado.caso);
   mostrarPantalla('inicio');
 }
