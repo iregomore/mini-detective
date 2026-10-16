@@ -20,3 +20,5 @@
 - La versión de la introducción y del relato sale de la semilla del caso (`variante: caso.semilla`), no del generador. Así la estructura del caso no cambia y las dos funciones siguen siendo puras.
 - Añado un lugar de hallazgo (la capilla, que no es una de las habitaciones jugables) y dos motivos más, para que haya más variedad.
 - El resto de la introducción (instrucciones y «las pistas no mienten…») es igual en todas las versiones, para que las reglas se lean siempre.
+- El test de 1.000 semillas pasa sin cambios con el contenido nuevo. Le añado una comprobación: en esas semillas salen como solución los 8 culpables, las 7 armas y las 7 habitaciones, y cualquier personaje puede ser el inocente sin pareja.
+- Prueba de humo en Chromium sin interfaz a 320 px (sin tocar ui.js): la página carga sin errores en consola, muestra la introducción nueva y no hay desbordamiento horizontal.

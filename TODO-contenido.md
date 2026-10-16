@@ -6,4 +6,4 @@ Decisiones en DECISIONES-contenido.md.
 - [x] Varias versiones de cada respuesta de interrogatorio por personaje, para que no suenen iguales entre partidas.
 - [x] Textos de introducción y de "lo que pasó realmente" con más ambientación, variando según víctima, arma y habitación.
 - [x] Si la lógica de juego.js asume 5 elementos fijos, adaptarla para leer la cantidad desde datos.js (cambio mínimo).
-[ ] El test de 1.000 semillas sigue pasando con el contenido nuevo.
+- [x] El test de 1.000 semillas sigue pasando con el contenido nuevo.
