@@ -21,3 +21,4 @@
 - Interfaz de una sola página: cada pantalla es una <section> y se muestra una cada vez. La semilla puede fijarse con ?semilla=N en la URL (útil para repetir un caso); si no, es aleatoria.
 - Los textos de la introducción se generan en juego.js (función pura) para poder probarlos con node --test.
 - El cuaderno se rellena solo al registrar habitaciones y hacer preguntas; agrupa las declaraciones por sospechoso. Es una pestaña fija de la barra superior para que esté siempre accesible.
+- Acusación de una sola oportunidad: el botón se activa al elegir las tres cosas; el resultado muestra qué se acertó, el relato y «Nueva partida» (que quita ?semilla= de la URL y genera un caso aleatorio).

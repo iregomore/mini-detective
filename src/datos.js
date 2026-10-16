@@ -73,6 +73,10 @@ export const textosRespuesta = {
 };
 
 export const textosResultado = {
+  gana: '¡Caso resuelto!',
+  pierde: 'El culpable se ha salido con la suya',
+  acierto: (parte, nombre) => `${parte}: ${nombre} ✓`,
+  fallo: (parte, nombre) => `${parte}: ${nombre} ✗`,
   relato: ({ culpable, rol, victima, arma, habitacion, motivo, hallazgo, mentira }) =>
     `${culpable}, ${rol}, mató a ${victima} con ${arma} en ${habitacion} porque ${motivo}. `
     + `Después, para despistar, dejó el cuerpo ${hallazgo}. `

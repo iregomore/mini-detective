@@ -14,6 +14,7 @@
       <button class="pestana" data-pantalla="mansion">Mansión</button>
       <button class="pestana" data-pantalla="interrogatorio">Interrogar</button>
       <button class="pestana" data-pantalla="cuaderno">Cuaderno</button>
+      <button class="pestana" data-pantalla="acusacion">Acusar</button>
     </nav>
   </header>
 
@@ -48,6 +49,26 @@
       <div id="cuaderno-pistas"></div>
       <h3>Declaraciones</h3>
       <div id="cuaderno-respuestas"></div>
+    </section>
+
+    <section id="pantalla-acusacion" class="pantalla" hidden>
+      <h2>Acusación</h2>
+      <p class="ayuda">Solo tienes una oportunidad. Elige culpable, arma y habitación.</p>
+      <h3>¿Quién?</h3>
+      <div id="opciones-culpable" class="opciones"></div>
+      <h3>¿Con qué?</h3>
+      <div id="opciones-arma" class="opciones"></div>
+      <h3>¿Dónde?</h3>
+      <div id="opciones-habitacion" class="opciones"></div>
+      <button id="boton-acusar" class="boton principal" disabled>Acusar</button>
+    </section>
+
+    <section id="pantalla-resultado" class="pantalla" hidden>
+      <h2 id="titulo-resultado"></h2>
+      <ul id="aciertos" class="aciertos"></ul>
+      <h3>Lo que pasó realmente</h3>
+      <p id="relato" class="texto-caso"></p>
+      <button id="boton-nueva" class="boton principal">Nueva partida</button>
     </section>
   </main>
 

@@ -131,3 +131,14 @@ h3 { font-size: 1.1rem; margin: 1em 0 0.5em; color: var(--suave); }
 h4 { margin: 0 0 8px; font-size: 1rem; }
 .boton.hecha::after { content: ' ✓'; color: var(--suave); }
 .texto-caso > .nota:last-child { margin-bottom: 0; }
+
+.boton:disabled { opacity: 0.45; cursor: not-allowed; }
+#boton-acusar { margin-top: 20px; }
+
+.gana { color: var(--bien); }
+.pierde { color: var(--mal); }
+
+.aciertos { list-style: none; padding: 0; margin: 0 0 8px; }
+.aciertos li { padding: 4px 0; }
+.aciertos .acierto { color: var(--bien); }
+.aciertos .fallo { color: var(--mal); }

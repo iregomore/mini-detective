@@ -1,13 +1,18 @@
 // Conecta la lógica del juego con la interfaz.
 import {
   generarCaso, introduccion, explorar, interrogar, nombreHabitacion,
-  crearCuaderno, anotarPista, anotarRespuesta,
+  crearCuaderno, anotarPista, anotarRespuesta, comprobarAcusacion,
+  sospechoso, nombreArma,
 } from './juego.js';
-import { habitaciones, sospechosos, preguntas } from './datos.js';
+import {
+  habitaciones, sospechosos, armas, preguntas, textosResultado,
+} from './datos.js';
 
 const $ = (selector) => document.querySelector(selector);
 
-const estado = { caso: null, sospechoso: null, cuaderno: crearCuaderno() };
+const estado = {
+  caso: null, sospechoso: null, cuaderno: crearCuaderno(), acusacion: {},
+};
 
 function semillaInicial() {
   const deUrl = Number(new URLSearchParams(location.search).get('semilla'));
@@ -26,7 +31,7 @@ function mostrarPantalla(nombre) {
   document.querySelectorAll('.pestana').forEach((b) => {
     b.classList.toggle('activa', b.dataset.pantalla === nombre);
   });
-  $('#navegacion').hidden = nombre === 'inicio';
+  $('#navegacion').hidden = nombre === 'inicio' || nombre === 'resultado';
   window.scrollTo(0, 0);
 }
 
@@ -150,6 +155,47 @@ function pintarCuaderno() {
     : [vacio('Todavía no has interrogado a nadie.')]));
 }
 
+const opcionesAcusacion = {
+  culpable: () => sospechosos.map((s) => ({ id: s.id, texto: presentar(s) })),
+  arma: () => armas.map((a) => ({ id: a.id, texto: mayuscula(a.nombre) })),
+  habitacion: () => habitaciones.map((h) => ({ id: h.id, texto: mayuscula(h.nombre) })),
+};
+
+function pintarAcusacion() {
+  for (const [parte, opciones] of Object.entries(opcionesAcusacion)) {
+    $(`#opciones-${parte}`).replaceChildren(...opciones().map(({ id, texto }) => {
+      const boton = crearBoton(texto, () => {
+        estado.acusacion = { ...estado.acusacion, [parte]: id };
+        pintarAcusacion();
+      });
+      boton.classList.toggle('elegido', estado.acusacion[parte] === id);
+      boton.setAttribute('aria-pressed', String(estado.acusacion[parte] === id));
+      return boton;
+    }));
+  }
+  $('#boton-acusar').disabled = Object.keys(opcionesAcusacion)
+    .some((parte) => !estado.acusacion[parte]);
+}
+
+function acusar() {
+  const { gana, aciertos, relato } = comprobarAcusacion(estado.caso, estado.acusacion);
+  const nombres = {
+    culpable: ['Culpable', sospechoso(estado.acusacion.culpable).nombre],
+    arma: ['Arma', nombreArma(estado.acusacion.arma)],
+    habitacion: ['Lugar', nombreHabitacion(estado.acusacion.habitacion)],
+  };
+  $('#titulo-resultado').textContent = gana ? textosResultado.gana : textosResultado.pierde;
+  $('#titulo-resultado').className = gana ? 'gana' : 'pierde';
+  $('#aciertos').replaceChildren(...Object.entries(nombres).map(([parte, [etiqueta, nombre]]) => {
+    const item = document.createElement('li');
+    item.className = aciertos[parte] ? 'acierto' : 'fallo';
+    item.textContent = (aciertos[parte] ? textosResultado.acierto : textosResultado.fallo)(etiqueta, nombre);
+    return item;
+  }));
+  $('#relato').textContent = relato;
+  mostrarPantalla('resultado');
+}
+
 function nuevaPartida(semilla) {
   estado.caso = generarCaso(semilla);
   estado.cuaderno = crearCuaderno();
@@ -158,6 +204,8 @@ function nuevaPartida(semilla) {
   estado.sospechoso = null;
   $('#bloque-preguntas').hidden = true;
   pintarSospechosos();
+  estado.acusacion = {};
+  pintarAcusacion();
   $('#introduccion').textContent = introduccion(estado.caso);
   mostrarPantalla('inicio');
 }
@@ -167,5 +215,10 @@ document.querySelectorAll('.pestana').forEach((b) => {
 });
 
 $('#boton-empezar').addEventListener('click', () => mostrarPantalla('mansion'));
+$('#boton-acusar').addEventListener('click', acusar);
+$('#boton-nueva').addEventListener('click', () => {
+  history.replaceState(null, '', location.pathname);
+  nuevaPartida(semillaAleatoria());
+});
 
 nuevaPartida(semillaInicial());
