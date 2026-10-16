@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generarCaso } from '../src/juego.js';
-import { habitaciones } from '../src/datos.js';
+import { habitaciones, sospechosos } from '../src/datos.js';
 
 test('cada habitación tiene una pista o nada', () => {
   const caso = generarCaso(5);
@@ -32,12 +32,14 @@ test('cada pista descarta una sola cosa: ninguna resuelve el caso por sí sola',
 test('los inocentes estaban por parejas fuera de la habitación del crimen', () => {
   const caso = generarCaso(9);
   const ids = Object.keys(caso.ubicaciones);
-  assert.equal(ids.length, 4);
+  assert.equal(ids.length, sospechosos.length - 1);
   assert.ok(!ids.includes(caso.culpable));
+  const solos = ids.filter((id) => caso.ubicaciones[id].con.length === 0);
+  assert.equal(solos.length, ids.length % 2, 'solo hay alguien sin pareja si son impares');
   for (const id of ids) {
     const { habitacion, con } = caso.ubicaciones[id];
     assert.notEqual(habitacion, caso.habitacion);
-    assert.equal(caso.ubicaciones[con[0]].habitacion, habitacion);
+    for (const otro of con) assert.equal(caso.ubicaciones[otro].habitacion, habitacion);
   }
 });
 

@@ -1,6 +1,6 @@
 // Lógica pura del juego. Sin acceso al DOM.
 import {
-  victimas, sospechosos, armas, habitaciones, lugaresHallazgo, motivos, textosPista, textosRespuesta, textosResultado, textosIntro,
+  victimas, sospechosos, armas, habitaciones, lugaresHallazgo, motivos, textosPista, textosResultado, textosIntro, frase,
 } from './datos.js';
 
 // Generador pseudoaleatorio determinista (mulberry32).
@@ -51,8 +51,9 @@ export function generarCaso(semilla) {
   return caso;
 }
 
-// Los cuatro inocentes estaban por parejas en dos habitaciones que no son la del crimen.
-// Las demás armas y habitaciones se descartan con hechos repartidos entre pistas y testigos.
+// Los inocentes estaban por parejas en habitaciones que no son la del crimen
+// (si son impares, uno estaba solo). Las demás armas y habitaciones se descartan
+// con hechos repartidos entre pistas y testigos.
 function planificarEscena(caso, aleatorio) {
   const otrasHabitaciones = barajar(
     habitaciones.map((h) => h.id).filter((id) => id !== caso.habitacion),
@@ -63,15 +64,16 @@ function planificarEscena(caso, aleatorio) {
     aleatorio,
   );
   const ubicaciones = {};
+  const grupos = Math.ceil(inocentes.length / 2);
   for (let i = 0; i < inocentes.length; i += 2) {
     const [uno, otro] = [inocentes[i], inocentes[i + 1]];
     const habitacion = otrasHabitaciones[i / 2];
-    ubicaciones[uno] = { habitacion, con: [otro] };
-    ubicaciones[otro] = { habitacion, con: [uno] };
+    ubicaciones[uno] = { habitacion, con: otro ? [otro] : [] };
+    if (otro) ubicaciones[otro] = { habitacion, con: [uno] };
   }
   const eliminaciones = [
     ...armas.filter((a) => a.id !== caso.arma).map((a) => ({ tipo: 'noArma', arma: a.id })),
-    ...otrasHabitaciones.slice(inocentes.length / 2).map((id) => ({ tipo: 'noLugar', habitacion: id })),
+    ...otrasHabitaciones.slice(grupos).map((id) => ({ tipo: 'noLugar', habitacion: id })),
   ];
   return { ubicaciones, eliminaciones };
 }
@@ -115,53 +117,58 @@ function generarRespuestas(caso, hechosTestigos, aleatorio) {
 function respuestasInocente(caso, id, hechoVisto, aleatorio) {
   const { habitacion, con } = caso.ubicaciones[id];
   const sospechado = elegir(sospechosos.filter((s) => s.id !== id), aleatorio).id;
+  const yo = sospechoso(id);
   return {
     donde: {
-      texto: textosRespuesta.dondeConPareja(nombreHabitacion(habitacion), nombreSospechoso(con[0])),
+      texto: con.length
+        ? frase(yo, 'conPareja', aleatorio, nombreHabitacion(habitacion), nombreSospechoso(con[0]))
+        : frase(yo, 'solo', aleatorio, nombreHabitacion(habitacion)),
       hechos: [{ tipo: 'estaba', persona: id, habitacion, con }],
     },
-    relacion: { texto: sospechoso(id).relacion, hechos: [] },
+    relacion: { texto: frase(yo, 'relacion', aleatorio), hechos: [] },
     extrano: hechoVisto
-      ? { texto: textoVisto(hechoVisto), hechos: [hechoVisto] }
-      : { texto: textosRespuesta.nadaRaro, hechos: [] },
-    quien: { texto: textosRespuesta.opinionInocente(nombreSospechoso(sospechado)), hechos: [] },
+      ? { texto: textoVisto(yo, hechoVisto, aleatorio), hechos: [hechoVisto] }
+      : { texto: frase(yo, 'nadaRaro', aleatorio), hechos: [] },
+    quien: { texto: frase(yo, 'opinion', aleatorio, nombreSospechoso(sospechado)), hechos: [] },
   };
 }
 
-function textoVisto(hecho) {
-  if (hecho.tipo === 'noArma') return textosRespuesta.vioArma(nombreArma(hecho.arma));
-  return textosRespuesta.vioLugar(nombreHabitacion(hecho.habitacion));
+function textoVisto(yo, hecho, aleatorio) {
+  if (hecho.tipo === 'noArma') return frase(yo, 'vioArma', aleatorio, nombreArma(hecho.arma));
+  return frase(yo, 'vioLugar', aleatorio, nombreHabitacion(hecho.habitacion));
 }
 
 // El culpable miente sobre dónde estaba de forma que contradice a algún inocente,
 // y a veces también finge que el arma del crimen no se usó.
 function respuestasCulpable(caso, aleatorio) {
   const id = caso.culpable;
-  const inocente = elegir(Object.keys(caso.ubicaciones), aleatorio);
+  const emparejados = Object.keys(caso.ubicaciones).filter((otro) => caso.ubicaciones[otro].con.length);
+  const inocente = elegir(emparejados, aleatorio);
   const { habitacion } = caso.ubicaciones[inocente];
   const finge = aleatorio() < 0.5;
   const acompanado = aleatorio() < 0.5;
+  const yo = sospechoso(id);
   return {
     donde: acompanado
       ? {
-        texto: textosRespuesta.dondeConOtro(nombreHabitacion(habitacion), nombreSospechoso(inocente)),
+        texto: frase(yo, 'conOtro', aleatorio, nombreHabitacion(habitacion), nombreSospechoso(inocente)),
         hechos: [{ tipo: 'estaba', persona: id, habitacion, con: [inocente] }],
         miente: true,
       }
       : {
-        texto: textosRespuesta.dondeSinCompania(nombreHabitacion(habitacion)),
+        texto: frase(yo, 'solo', aleatorio, nombreHabitacion(habitacion)),
         hechos: [{ tipo: 'estaba', persona: id, habitacion, con: [] }],
         miente: true,
       },
-    relacion: { texto: sospechoso(id).relacion, hechos: [] },
+    relacion: { texto: frase(yo, 'relacion', aleatorio), hechos: [] },
     extrano: finge
       ? {
-        texto: textosRespuesta.vioArma(nombreArma(caso.arma)),
+        texto: frase(yo, 'vioArma', aleatorio, nombreArma(caso.arma)),
         hechos: [{ tipo: 'noArma', arma: caso.arma }],
         miente: true,
       }
-      : { texto: textosRespuesta.nadaRaro, hechos: [] },
-    quien: { texto: textosRespuesta.opinionCulpable(nombreSospechoso(inocente)), hechos: [] },
+      : { texto: frase(yo, 'nadaRaro', aleatorio), hechos: [] },
+    quien: { texto: frase(yo, 'acusa', aleatorio, nombreSospechoso(inocente)), hechos: [] },
   };
 }
 
@@ -245,6 +252,9 @@ export function relatoDelCrimen(caso) {
     motivo: caso.motivo,
     hallazgo: caso.hallazgo,
     mentira: caso.respuestas[caso.culpable].donde.texto,
+    descripcionArma: armas.find((a) => a.id === caso.arma).descripcion,
+    descripcionHabitacion: habitaciones.find((h) => h.id === caso.habitacion).descripcion,
+    variante: caso.semilla,
   });
 }
 
@@ -254,6 +264,10 @@ export function introduccion(caso) {
     muerto: caso.victima.muerto,
     descripcion: caso.victima.descripcion,
     hallazgo: caso.hallazgo,
+    ambienteVictima: caso.victima.ambiente,
+    variante: caso.semilla,
+    numHabitaciones: habitaciones.length,
+    numSospechosos: sospechosos.length,
   });
 }
 

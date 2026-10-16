@@ -1,0 +1,25 @@
+# Decisiones — Contenido (v2)
+
+- Hago primero la tarea de adaptar juego.js a cantidades variables: con 8 personajes hay 7 inocentes y el reparto por parejas fallaba. Así cada commit deja los tests en verde.
+- Con un número impar de inocentes, uno estaba solo en su habitación (dice «sin compañía»). Su habitación también cuenta como descartada. La mentira del culpable siempre usa la habitación de una pareja, para que siga contradiciendo a dos testigos.
+- La introducción recibe el número de habitaciones y sospechosos y los escribe con letras (enLetras en datos.js) en vez de «cinco» fijo.
+- Marco las tareas como «- [x]», igual que en TODO.md.
+- Personajes nuevos: Amparo (cocinera), Julián (chófer) y Valeria (pintora). Mantengo los ids y nombres de los cinco anteriores para no romper tests ni partidas con semilla.
+- Cada personaje tiene `profesion`, `rasgo`, `habla` (descripción de su forma de hablar) y `voz`: sus frases para cada tipo de respuesta. `rol` se queda porque la interfaz lo usa.
+- Las frases se eligen con `frase(personaje, clave, aleatorio, ...datos)` en datos.js; juego.js solo cambia la llamada. Así quito los textos genéricos de respuesta (textosRespuesta), que ya no usa nadie.
+- Las opiniones sobre otros personajes no llevan adjetivos con género («hacía cosas raras», no «estaba raro»), porque el aludido puede ser hombre o mujer. Las relaciones con la víctima tampoco («Tenía un carácter exigente»).
+- Cada frase con información conserva el dato exacto (nombre de habitación, persona o arma) y el sentido («solo estábamos los dos», «sin compañía», «en su sitio»), que es lo que el solucionador modela. Lo comprueba test/personajes.test.js.
+- Nuevas habitaciones: el comedor y la bodega. Nuevas armas: el atizador y el abrecartas. Los ids antiguos no cambian.
+- Las descripciones (`descripcion`) de armas y habitaciones son de 80 caracteres como máximo, para que quepan en el móvil. No las enseño en las pistas, porque la interfaz no es de mi zona; las uso en el relato final (tarea 4).
+- Como ahora hay armas en femenino («la cuerda», «la llave inglesa»), quito los adjetivos y pronombres con género en las frases sobre armas («limpio», «nadie lo tocó» → «sin una mancha», «nadie se acercó»).
+- Con 7 inocentes, 7 habitaciones y 7 armas, cada caso tiene 8 descartes (6 armas y 2 habitaciones vacías): 3–4 van a pistas y 4–5 a testigos. Hay 7 inocentes, así que siempre hay testigos suficientes.
+- Tres versiones de cada respuesta por personaje (9 tipos × 8 personajes). La versión se elige con el generador del caso, así que una misma semilla da siempre los mismos textos.
+- Las frases no ponen «a» ni «de» delante del nombre de una habitación o un arma, para que no salga «a el salón» o «de el atizador». Uso «en» y «por».
+- Un test comprueba que cada versión conserva el sentido que modela el solucionador: «solo estábamos los dos», «confirm…/pregúntale», «sin compañía/sola», «en su sitio», «no ocurrió/pasó nada».
+- La introducción no puede nombrar el arma ni la habitación del crimen, porque hay que deducirlas. Por eso cambia según la víctima (cada una tiene `ambiente`: qué hacía esa noche), el tiempo que hace (`ambientes`) y la versión del texto. El relato final sí usa la descripción del arma y de la habitación del crimen.
+- La versión de la introducción y del relato sale de la semilla del caso (`variante: caso.semilla`), no del generador. Así la estructura del caso no cambia y las dos funciones siguen siendo puras.
+- Añado un lugar de hallazgo (la capilla, que no es una de las habitaciones jugables) y dos motivos más, para que haya más variedad.
+- El resto de la introducción (instrucciones y «las pistas no mienten…») es igual en todas las versiones, para que las reglas se lean siempre.
+- El test de 1.000 semillas pasa sin cambios con el contenido nuevo. Le añado una comprobación: en esas semillas salen como solución los 8 culpables, las 7 armas y las 7 habitaciones, y cualquier personaje puede ser el inocente sin pareja.
+- Prueba de humo en Chromium sin interfaz a 320 px (sin tocar ui.js): la página carga sin errores en consola, muestra la introducción nueva y no hay desbordamiento horizontal.
+- La rama remota v2-contenido ya tenía el trabajo del agente de guardado (guardado.js y ui.js). Para no sobrescribirlo ni mezclarlo en este PR, subo el contenido a la rama de la sesión (ccr-67db38e7-s6fj4v) y abro el PR desde ahí. Lo he probado mezclado con esa rama: no hay conflictos y pasan los 59 tests.
