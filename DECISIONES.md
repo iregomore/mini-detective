@@ -13,3 +13,6 @@
 - «¿Qué relación tenías?» y «¿Quién crees que lo hizo?» son ambientación: no aportan hechos al solucionador. Las opiniones de los inocentes son impresiones («actuaba raro»), no afirmaciones falsas.
 - Las respuestas mentirosas llevan `miente: true` para los tests; la interfaz no lo muestra.
 - Solucionador por fuerza bruta (125 combinaciones): para cada sospechoso ignora sus declaraciones y comprueba que el resto de hechos es coherente con que estuviera solo en la habitación del crimen y los demás, fuera de ella.
+- «Ninguna pista sola basta» lo compruebo de dos formas: cada dato suelto (pista o respuesta) deja más de una combinación, y ni todas las pistas ni todas las respuestas por separado resuelven el caso.
+- «Mentira detectable» = si se creyera todo lo que dice el culpable, ninguna combinación sería coherente.
+- El generador construye la escena para que la solución sea única por diseño; el test de 1.000 semillas pasó sin necesidad de reintentos.
