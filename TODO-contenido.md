@@ -1,7 +1,7 @@
 Tareas v2 — Agente A: Contenido
 Zona de trabajo: src/datos.js y tests relacionados. No toques src/ui.js ni la lógica de dificultad.
 Decisiones en DECISIONES-contenido.md.
-[ ] Ampliar a 8 personajes (nombre, profesión, rasgo, forma de hablar propia).
+- [x] Ampliar a 8 personajes (nombre, profesión, rasgo, forma de hablar propia).
 [ ] Ampliar a 7 habitaciones y 7 armas, cada una con una descripción breve.
 [ ] Varias versiones de cada respuesta de interrogatorio por personaje, para que no suenen iguales entre partidas.
 [ ] Textos de introducción y de "lo que pasó realmente" con más ambientación, variando según víctima, arma y habitación.
