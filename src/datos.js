@@ -49,7 +49,7 @@ export const sospechosos = [
       conPareja: [(h, p) => `Estaba en ${h} con ${p}, en plan, toda la noche. Solo estábamos los dos, ¿vale?`],
       conOtro: [(h, o) => `Estaba en ${h} con ${o}, pregúntale, de verdad, te lo va a decir.`],
       solo: [(h) => `Estaba en ${h}, sola. Necesitaba estar a mi bola un rato, ¿vale?`],
-      vioArma: [(a) => `O sea, vi ${a} en su sitio toda la noche. Nadie lo tocó, te lo juro.`],
+      vioArma: [(a) => `O sea, vi ${a} en su sitio toda la noche. Nadie le puso un dedo encima, te lo juro.`],
       vioLugar: [(h) => `Pasé por ${h} a esa hora y no había nadie, en serio. Allí no pasó nada.`],
       nadaRaro: ['Pues… no, nada raro. Estaba con el móvil, la verdad.'],
       opinion: [(o) => `Ni idea… pero ${o} hacía cosas superraras esta noche, en plan, rarísimas.`],
@@ -87,7 +87,7 @@ export const sospechosos = [
       conPareja: [(h, p) => `Entre las diez y las once estuve en ${h} con ${p}. Solo estábamos los dos. Es un dato exacto.`],
       conOtro: [(h, o) => `Estuve en ${h} con ${o}, de diez a once. Puede confirmarlo.`],
       solo: [(h) => `Estuve en ${h}, sola, de diez a once. Repasaba historiales clínicos.`],
-      vioArma: [(a) => `Observé ${a} en su sitio durante toda la noche. Nadie lo manipuló.`],
+      vioArma: [(a) => `Observé ${a} en su sitio durante toda la noche. Nadie se aproximó en ningún momento.`],
       vioLugar: [(h) => `Pasé por ${h} a las diez y media y no había nadie. Allí no ocurrió nada.`],
       nadaRaro: ['Nada reseñable. Y suelo fijarme en los detalles.'],
       opinion: [(o) => `No haré un diagnóstico sin pruebas, pero ${o} mostraba signos claros de ansiedad esta noche.`],
@@ -106,7 +106,7 @@ export const sospechosos = [
       conPareja: [(h, p) => `En ${h}. Con ${p}. Solo estábamos los dos.`],
       conOtro: [(h, o) => `En ${h}, con ${o}. Que lo diga.`],
       solo: [(h) => `En ${h}. Sin compañía. Mejor solo que mal acompañado.`],
-      vioArma: [(a) => `${mayuscula(a)}, en su sitio. Toda la noche. Nadie lo tocó.`],
+      vioArma: [(a) => `${mayuscula(a)}, en su sitio. Toda la noche. Nadie se acercó.`],
       vioLugar: [(h) => `Pasé por ${h}. No había nadie. Allí no pasó nada.`],
       nadaRaro: ['No. Nada.'],
       opinion: [(o) => `No sé. Pero ${o} hacía cosas raras esta noche. Muy raras.`],
@@ -163,7 +163,7 @@ export const sospechosos = [
       conPareja: [(h, p) => `Estaba en ${h} con ${p}, como dos figuras en un cuadro. Solo estábamos los dos.`],
       conOtro: [(h, o) => `Estaba en ${h} con ${o}, que es testigo de mi inocencia. Puede confirmarlo.`],
       solo: [(h) => `Estaba en ${h}, sola con mis pensamientos. La inspiración no admite compañía.`],
-      vioArma: [(a) => `Vi ${a} en su sitio toda la noche, quieto como una naturaleza muerta. Nadie se acercó.`],
+      vioArma: [(a) => `Vi ${a} en su sitio toda la noche, inmóvil como en una naturaleza muerta. Nadie se acercó.`],
       vioLugar: [(h) => `Pasé por ${h} a esa hora: vacío, silencioso como un lienzo en blanco. Allí no ocurrió nada.`],
       nadaRaro: ['Nada extraño… salvo la luna, que esta noche tenía un color de sangre.'],
       opinion: [(o) => `Hay algo turbio en la mirada de ${o} esta noche. Una sombra que no sabría pintar.`],
@@ -173,19 +173,23 @@ export const sospechosos = [
 ];
 
 export const armas = [
-  { id: 'candelabro', nombre: 'el candelabro' },
-  { id: 'cuchillo', nombre: 'el cuchillo' },
-  { id: 'cuerda', nombre: 'la cuerda' },
-  { id: 'veneno', nombre: 'el veneno' },
-  { id: 'llave', nombre: 'la llave inglesa' },
+  { id: 'candelabro', nombre: 'el candelabro', descripcion: 'un pesado candelabro de plata de tres brazos' },
+  { id: 'cuchillo', nombre: 'el cuchillo', descripcion: 'un cuchillo de trinchar con mango de hueso' },
+  { id: 'cuerda', nombre: 'la cuerda', descripcion: 'un cordón grueso arrancado de las cortinas' },
+  { id: 'veneno', nombre: 'el veneno', descripcion: 'un frasquito de arsénico sin etiqueta' },
+  { id: 'llave', nombre: 'la llave inglesa', descripcion: 'una llave inglesa que olvidó el fontanero' },
+  { id: 'atizador', nombre: 'el atizador', descripcion: 'el atizador de hierro de la chimenea' },
+  { id: 'abrecartas', nombre: 'el abrecartas', descripcion: 'un abrecartas de bronce con forma de daga' },
 ];
 
 export const habitaciones = [
-  { id: 'biblioteca', nombre: 'la biblioteca' },
-  { id: 'cocina', nombre: 'la cocina' },
-  { id: 'salon', nombre: 'el salón' },
-  { id: 'estudio', nombre: 'el estudio' },
-  { id: 'invernadero', nombre: 'el invernadero' },
+  { id: 'biblioteca', nombre: 'la biblioteca', descripcion: 'estanterías hasta el techo y un sillón de cuero junto a la chimenea' },
+  { id: 'cocina', nombre: 'la cocina', descripcion: 'fogones de hierro, ollas de cobre y olor a guiso' },
+  { id: 'salon', nombre: 'el salón', descripcion: 'un piano de cola y grandes ventanales sobre el jardín' },
+  { id: 'estudio', nombre: 'el estudio', descripcion: 'un escritorio de caoba cubierto de papeles y un reloj de pared' },
+  { id: 'invernadero', nombre: 'el invernadero', descripcion: 'plantas exóticas, cristales empañados y un calor húmedo' },
+  { id: 'comedor', nombre: 'el comedor', descripcion: 'una mesa larga para veinte comensales bajo una lámpara de araña' },
+  { id: 'bodega', nombre: 'la bodega', descripcion: 'barricas de vino, telarañas y una única bombilla' },
 ];
 
 export const lugaresHallazgo = [
@@ -210,7 +214,7 @@ export const preguntas = [
 
 // Textos de las pistas que se encuentran en las habitaciones.
 export const textosPista = {
-  noArma: (arma) => `Encuentras ${arma} en su sitio, limpio y sin rastro de uso. No es el arma del crimen.`,
+  noArma: (arma) => `Encuentras ${arma} en su sitio, sin una mancha ni rastro de uso. No es el arma del crimen.`,
   noLugarAqui: () => 'Todo está en perfecto orden y el polvo de los muebles no se ha movido. Aquí no ocurrió el crimen.',
   noLugarOtro: (habitacion) => `Encuentras una nota de la doncella: «Estuve limpiando ${habitacion} toda la noche y allí no pasó nada».`,
   nada: 'Buscas por todas partes, pero aquí no hay nada.',
