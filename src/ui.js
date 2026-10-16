@@ -191,6 +191,7 @@ function pintarAcusacion() {
 
 function acusar() {
   const { gana, aciertos, relato } = comprobarAcusacion(estado.caso, estado.acusacion);
+  borrarPartida();
   const nombres = {
     culpable: ['Culpable', sospechoso(estado.acusacion.culpable).nombre],
     arma: ['Arma', nombreArma(estado.acusacion.arma)],

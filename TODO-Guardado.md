@@ -5,5 +5,5 @@ Decisiones en DECISIONES-guardado.md.
 - [x] Tests de guardado.js con un localStorage simulado.
 - [x] Guardar automáticamente después de cada acción del jugador.
 - [x] Al abrir el juego, si hay una partida a medias, ofrecer "Continuar" o "Nueva partida".
-[ ] Al terminar una partida (ganada o perdida), borrar la partida guardada.
+- [x] Al terminar una partida (ganada o perdida), borrar la partida guardada.
 [ ] Contador simple de partidas ganadas y jugadas, visible en la pantalla de inicio.

@@ -13,3 +13,4 @@
 - Nueva partida desde el inicio usa la semilla de la URL si la hay (?semilla=N); si no, una aleatoria. Empezarla borra la partida guardada.
 - La restauración (restaurarPartida) vive en guardado.js como función pura y probada; ignora identificadores que ya no existan en datos.js, por si el contenido cambia entre versiones. Si aun así falla, se descarta la partida y se empieza una nueva.
 - El atributo hidden no oculta «Empezar la investigación» porque .boton fija display: block; lo oculto con style.display desde ui.js en lugar de tocar styles.css.
+- La partida guardada se borra en cuanto se acusa (gane o pierda), antes de mostrar el resultado: recargar en la pantalla de resultado ya no ofrece continuar un caso cerrado.
