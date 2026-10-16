@@ -13,3 +13,6 @@
 - Las descripciones (`descripcion`) de armas y habitaciones son de 80 caracteres como máximo, para que quepan en el móvil. No las enseño en las pistas, porque la interfaz no es de mi zona; las uso en el relato final (tarea 4).
 - Como ahora hay armas en femenino («la cuerda», «la llave inglesa»), quito los adjetivos y pronombres con género en las frases sobre armas («limpio», «nadie lo tocó» → «sin una mancha», «nadie se acercó»).
 - Con 7 inocentes, 7 habitaciones y 7 armas, cada caso tiene 8 descartes (6 armas y 2 habitaciones vacías): 3–4 van a pistas y 4–5 a testigos. Hay 7 inocentes, así que siempre hay testigos suficientes.
+- Tres versiones de cada respuesta por personaje (9 tipos × 8 personajes). La versión se elige con el generador del caso, así que una misma semilla da siempre los mismos textos.
+- Las frases no ponen «a» ni «de» delante del nombre de una habitación o un arma, para que no salga «a el salón» o «de el atizador». Uso «en» y «por».
+- Un test comprueba que cada versión conserva el sentido que modela el solucionador: «solo estábamos los dos», «confirm…/pregúntale», «sin compañía/sola», «en su sitio», «no ocurrió/pasó nada».
