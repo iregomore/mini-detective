@@ -5,11 +5,26 @@ export const enLetras = (n) => numeros[n] ?? String(n);
 const mayuscula = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1);
 
 export const victimas = [
-  { nombre: 'Lord Alistair Pemberton', muerto: 'muerto', descripcion: 'el anciano dueño de la mansión' },
-  { nombre: 'Doña Remedios Villalba', muerto: 'muerta', descripcion: 'la rica viuda que daba la fiesta' },
-  { nombre: 'Ezequiel Mora', muerto: 'muerto', descripcion: 'un famoso coleccionista de arte' },
-  { nombre: 'Inés de Altamira', muerto: 'muerta', descripcion: 'la condesa, heredera de la fortuna familiar' },
-  { nombre: 'Don Fermín Castro', muerto: 'muerto', descripcion: 'el banquero más temido de la ciudad' },
+  {
+    nombre: 'Lord Alistair Pemberton', muerto: 'muerto', descripcion: 'el anciano dueño de la mansión',
+    ambiente: 'celebraba con una cena su ochenta cumpleaños',
+  },
+  {
+    nombre: 'Doña Remedios Villalba', muerto: 'muerta', descripcion: 'la rica viuda que daba la fiesta',
+    ambiente: 'había organizado un baile de máscaras a beneficio del hospital',
+  },
+  {
+    nombre: 'Ezequiel Mora', muerto: 'muerto', descripcion: 'un famoso coleccionista de arte',
+    ambiente: 'iba a enseñar a sus invitados un cuadro recién comprado',
+  },
+  {
+    nombre: 'Inés de Altamira', muerto: 'muerta', descripcion: 'la condesa, heredera de la fortuna familiar',
+    ambiente: 'había reunido a todos para anunciar cambios en su testamento',
+  },
+  {
+    nombre: 'Don Fermín Castro', muerto: 'muerto', descripcion: 'el banquero más temido de la ciudad',
+    ambiente: 'brindaba por la compra de un banco rival',
+  },
 ];
 
 // Sospechosos. Cada uno tiene su forma de hablar: `voz` reúne, para cada tipo de respuesta,
@@ -484,6 +499,7 @@ export const lugaresHallazgo = [
   'tendido en el vestíbulo, al pie de la escalera',
   'en el jardín, junto a la fuente',
   'en el pasillo del primer piso',
+  'junto a la puerta de la capilla',
 ];
 
 export const motivos = [
@@ -491,7 +507,20 @@ export const motivos = [
   'iba a quedarse sin trabajo y sin herencia',
   'le debía una fortuna que no podía pagar',
   'había descubierto un secreto que podía arruinarle',
+  'no le perdonaba una humillación delante de todos',
+  'temía que contara a todos lo que sabía de su pasado',
 ];
+
+// Cómo estaba la noche; da ambiente a la introducción.
+export const ambientes = [
+  'Fuera, la tormenta ha cortado el único camino al pueblo',
+  'Una niebla espesa envuelve la mansión y no se ve más allá de la verja',
+  'El viento hace golpear las contraventanas y las luces parpadean',
+  'La luna llena ilumina el jardín y los perros no dejan de aullar',
+];
+
+// Elige una versión de una lista a partir de un número fijo (la semilla del caso).
+const version = (lista, n) => lista[Math.abs(n) % lista.length];
 
 export const preguntas = [
   { id: 'donde', texto: '¿Dónde estabas a la hora del crimen?' },
@@ -515,23 +544,55 @@ export function frase(personaje, clave, aleatorio, ...datos) {
   return typeof elegida === 'function' ? elegida(...datos) : elegida;
 }
 
+// Versiones de «lo que pasó realmente». Todas nombran culpable, víctima, arma y habitación,
+// y describen el arma y la habitación del crimen.
+const relatos = [
+  (d) => `${d.culpable}, ${d.rol}, mató a ${d.victima} con ${d.arma} en ${d.habitacion} porque ${d.motivo}. `
+    + `Allí, entre ${d.descripcionHabitacion}, nadie oyó nada. El arma: ${d.descripcionArma}. `
+    + `Después, para despistar, dejó el cuerpo ${d.hallazgo}. `
+    + `Mintió al decir: «${d.mentira}».`,
+  (d) => `Todo ocurrió en ${d.habitacion}: ${d.descripcionHabitacion}. `
+    + `${d.culpable}, ${d.rol}, citó allí a ${d.victima} y le quitó la vida con ${d.arma}, ${d.descripcionArma}, porque ${d.motivo}. `
+    + `Luego, para que nadie supiera dónde había sido, dejó el cuerpo ${d.hallazgo}. `
+    + `Su error fue mentir: «${d.mentira}».`,
+  (d) => `La verdad es esta: ${d.culpable}, ${d.rol}, ${d.motivo}. `
+    + `Por eso esperó a ${d.victima} en ${d.habitacion}, entre ${d.descripcionHabitacion}, y usó ${d.arma}: ${d.descripcionArma}. `
+    + `Para despistar, dejó el cuerpo ${d.hallazgo}. `
+    + `Pero se delató al decir: «${d.mentira}».`,
+];
+
 export const textosResultado = {
   gana: '¡Caso resuelto!',
   pierde: 'El culpable se ha salido con la suya',
   acierto: (parte, nombre) => `${parte}: ${nombre} ✓`,
   fallo: (parte, nombre) => `${parte}: ${nombre} ✗`,
-  relato: ({ culpable, rol, victima, arma, habitacion, motivo, hallazgo, mentira }) =>
-    `${culpable}, ${rol}, mató a ${victima} con ${arma} en ${habitacion} porque ${motivo}. `
-    + `Después, para despistar, dejó el cuerpo ${hallazgo}. `
-    + `Mintió al decir: «${mentira.replace(/\.$/, '')}».`,
+  relato: ({ variante = 0, mentira, ...datos }) => version(relatos, variante)({
+    ...datos, mentira: mentira.replace(/\.$/, ''),
+  }),
 };
+
+// Versiones del comienzo de la introducción. Varían según la víctima (lo que hacía esa noche)
+// y el ambiente; no mencionan el arma ni la habitación del crimen, que hay que deducir.
+const introducciones = [
+  (d) => `${d.ambiente}. Esta noche ha aparecido ${d.muerto} ${d.victima}, ${d.descripcion}. Precisamente hoy ${d.ambienteVictima}. `
+    + `Encontraron el cuerpo ${d.hallazgo}, pero el crimen ocurrió en alguna de las ${d.habitaciones} habitaciones de la mansión. `
+    + `${mayuscula(d.personas)} personas estaban en la casa y una de ellas es culpable.`,
+  (d) => `Todo estaba preparado: ${d.victima}, ${d.descripcion}, ${d.ambienteVictima}. ${d.ambiente}. `
+    + `A medianoche, un grito: ha aparecido ${d.muerto} ${d.victima}. Encontraron el cuerpo ${d.hallazgo}. `
+    + `Nadie ha salido de la casa: una de las ${d.personas} personas que quedan dentro es culpable, `
+    + `y el crimen se cometió en una de las ${d.habitaciones} habitaciones.`,
+  (d) => `${d.ambiente}. Dentro, ${d.victima}, ${d.descripcion}, ${d.ambienteVictima}… hasta que ha aparecido ${d.muerto}. `
+    + `Encontraron el cuerpo ${d.hallazgo}, aunque no le mataron allí: fue en una de las ${d.habitaciones} habitaciones. `
+    + `${mayuscula(d.personas)} personas tenían motivos y ocasión. Una de ellas miente.`,
+];
 
 export const textosIntro = {
   titulo: 'Mini Detective',
-  introduccion: ({ victima, muerto, descripcion, hallazgo, numHabitaciones, numSospechosos }) =>
-    `Esta noche ha aparecido ${muerto} ${victima}, ${descripcion}. `
-    + `Encontraron el cuerpo ${hallazgo}, pero el crimen ocurrió en alguna de las ${enLetras(numHabitaciones)} habitaciones de la mansión. `
-    + `${mayuscula(enLetras(numSospechosos))} personas estaban en la casa y una de ellas es culpable. `
-    + 'Explora las habitaciones, interroga a los sospechosos y acusa cuando lo tengas claro. '
+  introduccion: ({ variante = 0, ...datos }) => version(introducciones, variante)({
+    ...datos,
+    ambiente: version(ambientes, Math.floor(variante / introducciones.length)),
+    habitaciones: enLetras(datos.numHabitaciones),
+    personas: enLetras(datos.numSospechosos),
+  }) + ' Explora las habitaciones, interroga a los sospechosos y acusa cuando lo tengas claro. '
     + 'Recuerda: las pistas no mienten y los inocentes dicen la verdad… pero el culpable, no.',
 };

@@ -252,6 +252,9 @@ export function relatoDelCrimen(caso) {
     motivo: caso.motivo,
     hallazgo: caso.hallazgo,
     mentira: caso.respuestas[caso.culpable].donde.texto,
+    descripcionArma: armas.find((a) => a.id === caso.arma).descripcion,
+    descripcionHabitacion: habitaciones.find((h) => h.id === caso.habitacion).descripcion,
+    variante: caso.semilla,
   });
 }
 
@@ -261,6 +264,8 @@ export function introduccion(caso) {
     muerto: caso.victima.muerto,
     descripcion: caso.victima.descripcion,
     hallazgo: caso.hallazgo,
+    ambienteVictima: caso.victima.ambiente,
+    variante: caso.semilla,
     numHabitaciones: habitaciones.length,
     numSospechosos: sospechosos.length,
   });

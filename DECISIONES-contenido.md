@@ -16,3 +16,7 @@
 - Tres versiones de cada respuesta por personaje (9 tipos × 8 personajes). La versión se elige con el generador del caso, así que una misma semilla da siempre los mismos textos.
 - Las frases no ponen «a» ni «de» delante del nombre de una habitación o un arma, para que no salga «a el salón» o «de el atizador». Uso «en» y «por».
 - Un test comprueba que cada versión conserva el sentido que modela el solucionador: «solo estábamos los dos», «confirm…/pregúntale», «sin compañía/sola», «en su sitio», «no ocurrió/pasó nada».
+- La introducción no puede nombrar el arma ni la habitación del crimen, porque hay que deducirlas. Por eso cambia según la víctima (cada una tiene `ambiente`: qué hacía esa noche), el tiempo que hace (`ambientes`) y la versión del texto. El relato final sí usa la descripción del arma y de la habitación del crimen.
+- La versión de la introducción y del relato sale de la semilla del caso (`variante: caso.semilla`), no del generador. Así la estructura del caso no cambia y las dos funciones siguen siendo puras.
+- Añado un lugar de hallazgo (la capilla, que no es una de las habitaciones jugables) y dos motivos más, para que haya más variedad.
+- El resto de la introducción (instrucciones y «las pistas no mienten…») es igual en todas las versiones, para que las reglas se lean siempre.
