@@ -1,0 +1,28 @@
+# Decisiones
+
+- TODO.md usa "[ ]" sin guion; al completar una tarea la marco como "- [x]" (formato que pide CLAUDE.md).
+- Añado package.json con "type": "module" (sin dependencias) para que node use módulos ES en src/ y test/.
+- Generador pseudoaleatorio mulberry32: pequeño, determinista y sin dependencias.
+- 5 sospechosos, 5 armas y 5 habitaciones; la víctima es un personaje aparte (no es sospechoso).
+- El cadáver aparece fuera de las 5 habitaciones (vestíbulo, jardín, pasillo): así la habitación del crimen hay que deducirla.
+- Modelo lógico: las pistas y los inocentes siempre dicen la verdad; solo el culpable miente. Así un solucionador puede probar cada hipótesis ignorando las declaraciones del sospechoso acusado.
+- Escena: los 4 inocentes estaban por parejas en dos habitaciones distintas de la del crimen; el culpable estaba solo en la habitación del crimen.
+- Cada pista descarta un arma o una habitación (nunca un sospechoso), así que ninguna pista sola resuelve el caso. Hay 3 o 4 pistas; el resto de habitaciones están vacías.
+- Los descartes que no van a habitaciones los aporta algún inocente al responder «¿Viste algo extraño?».
+- Mentira detectable del culpable: dice que estaba en la habitación de una pareja de inocentes (solo o «con» uno de ellos), pero la pareja afirma que solo estaban ellos dos. A veces además dice que vio el arma del crimen sin usar (también se detecta: contradice los descartes de las demás armas).
+- «¿Qué relación tenías?» y «¿Quién crees que lo hizo?» son ambientación: no aportan hechos al solucionador. Las opiniones de los inocentes son impresiones («actuaba raro»), no afirmaciones falsas.
+- Las respuestas mentirosas llevan `miente: true` para los tests; la interfaz no lo muestra.
+- Solucionador por fuerza bruta (125 combinaciones): para cada sospechoso ignora sus declaraciones y comprueba que el resto de hechos es coherente con que estuviera solo en la habitación del crimen y los demás, fuera de ella.
+- «Ninguna pista sola basta» lo compruebo de dos formas: cada dato suelto (pista o respuesta) deja más de una combinación, y ni todas las pistas ni todas las respuestas por separado resuelven el caso.
+- «Mentira detectable» = si se creyera todo lo que dice el culpable, ninguna combinación sería coherente.
+- El generador construye la escena para que la solución sea única por diseño; el test de 1.000 semillas pasó sin necesidad de reintentos.
+- comprobarAcusacion devuelve también qué partes se acertaron (culpable, arma, habitación) para mostrarlo en el resultado; el relato incluye motivo, dónde dejó el cuerpo y la frase con la que mintió.
+- Los nombres de víctimas van sin artículo («Ezequiel Mora») para que las frases no queden como «a El doctor…».
+- Interfaz de una sola página: cada pantalla es una <section> y se muestra una cada vez. La semilla puede fijarse con ?semilla=N en la URL (útil para repetir un caso); si no, es aleatoria.
+- Los textos de la introducción se generan en juego.js (función pura) para poder probarlos con node --test.
+- El cuaderno se rellena solo al registrar habitaciones y hacer preguntas; agrupa las declaraciones por sospechoso. Es una pestaña fija de la barra superior para que esté siempre accesible.
+- Acusación de una sola oportunidad: el botón se activa al elegir las tres cosas; el resultado muestra qué se acertó, el relato y «Nueva partida» (que quita ?semilla= de la URL y genera un caso aleatorio).
+- Revisión en móvil con Chromium sin interfaz a 320 y 375 px de ancho: sin desbordamiento horizontal, botones de al menos 44 px de alto y texto base de 18 px. Las cuatro pestañas se reparten el ancho para que quepan en 320 px.
+- Concordancia de género: cada víctima indica «muerto/muerta»; textos de sospechosos y motivos redactados para no depender del género.
+- Publicación: workflow de GitHub Actions que ejecuta node --test y despliega index.html, styles.css y src/ en Pages en cada push a main. Hay que elegir una vez «Source: GitHub Actions» en Settings → Pages (explicado en README.md); no puedo hacerlo yo desde aquí. Mientras el trabajo esté en la rama claude/todo-tasks-335ozh no se publica: se publicará al fusionarla en main.
+- SPEC.md no tiene una sección de «criterios de terminado»; he usado como criterios los pasos de «Cómo se juega». Comprobado con una partida completa en Chromium (servida desde un subdirectorio, como en Pages): inicio con víctima e introducción, explorar las 5 habitaciones, 4 preguntas a los 5 sospechosos, cuaderno con las 25 anotaciones, acusación ganadora con relato, y nueva partida. La duración de 10–15 minutos no se puede comprobar automáticamente.
