@@ -4,6 +4,6 @@ Decisiones en DECISIONES-guardado.md.
 - [x] src/guardado.js: guardar y cargar el estado de la partida (semilla, pistas encontradas, respuestas obtenidas) en localStorage, envuelto en try/catch para que el juego funcione aunque falle.
 - [x] Tests de guardado.js con un localStorage simulado.
 - [x] Guardar automáticamente después de cada acción del jugador.
-[ ] Al abrir el juego, si hay una partida a medias, ofrecer "Continuar" o "Nueva partida".
+- [x] Al abrir el juego, si hay una partida a medias, ofrecer "Continuar" o "Nueva partida".
 [ ] Al terminar una partida (ganada o perdida), borrar la partida guardada.
 [ ] Contador simple de partidas ganadas y jugadas, visible en la pantalla de inicio.

@@ -1,6 +1,11 @@
 // Guardar y cargar la partida en curso en localStorage.
 // Todo va envuelto en try/catch: si el almacenamiento falla, el juego sigue sin guardar.
 
+import {
+  generarCaso, explorar, interrogar, crearCuaderno, anotarPista, anotarRespuesta,
+} from './juego.js';
+import { habitaciones, sospechosos, armas, preguntas } from './datos.js';
+
 const CLAVE_PARTIDA = 'mini-detective:partida';
 const VERSION = 1;
 
@@ -75,4 +80,34 @@ export function cargarPartida(almacen = almacenPorDefecto()) {
 
 export function borrarPartida(almacen = almacenPorDefecto()) {
   quitar(almacen, CLAVE_PARTIDA);
+}
+
+const existe = (lista, id) => lista.some((elemento) => elemento.id === id);
+
+// Reconstruye el caso, el cuaderno y la acusación a partir de una partida guardada.
+// Los identificadores que ya no existan en los datos se ignoran.
+export function restaurarPartida(partida) {
+  const caso = generarCaso(partida.semilla);
+  let cuaderno = crearCuaderno();
+  for (const habitacion of partida.pistas.filter((id) => existe(habitaciones, id))) {
+    cuaderno = anotarPista(cuaderno, habitacion, explorar(caso, habitacion));
+  }
+  const validas = partida.respuestas
+    .filter((r) => existe(sospechosos, r.sospechoso) && existe(preguntas, r.pregunta));
+  for (const { sospechoso, pregunta } of validas) {
+    cuaderno = anotarRespuesta(cuaderno, sospechoso, pregunta, interrogar(caso, sospechoso, pregunta));
+  }
+  const listas = { culpable: sospechosos, arma: armas, habitacion: habitaciones };
+  const acusacion = Object.fromEntries(Object.entries(listas)
+    .filter(([parte, lista]) => existe(lista, partida.acusacion[parte]))
+    .map(([parte]) => [parte, partida.acusacion[parte]]));
+  return { caso, cuaderno, acusacion };
+}
+
+const plural = (n, singular, varios) => `${n} ${n === 1 ? singular : varios}`;
+
+export function resumenPartidaGuardada(cuaderno) {
+  const habitacionesRegistradas = plural(cuaderno.pistas.length, 'habitación registrada', 'habitaciones registradas');
+  const preguntasHechas = plural(cuaderno.respuestas.length, 'pregunta hecha', 'preguntas hechas');
+  return `Tienes este caso a medias: ${habitacionesRegistradas} y ${preguntasHechas}.`;
 }

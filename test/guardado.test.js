@@ -1,8 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { crearCuaderno, anotarPista, anotarRespuesta } from '../src/juego.js';
+import {
+  generarCaso, crearCuaderno, anotarPista, anotarRespuesta, explorar, interrogar,
+} from '../src/juego.js';
 import {
   resumirPartida, guardarPartida, cargarPartida, borrarPartida,
+  restaurarPartida, resumenPartidaGuardada,
 } from '../src/guardado.js';
 
 function almacenSimulado() {
@@ -75,4 +78,37 @@ test('sin almacenamiento disponible, guardar y cargar no fallan', () => {
   assert.equal(guardarPartida(partidaDeEjemplo(), null), false);
   assert.equal(cargarPartida(null), null);
   assert.doesNotThrow(() => borrarPartida(null));
+});
+
+test('restaurar reconstruye el mismo cuaderno a partir de la semilla', () => {
+  const caso = generarCaso(77);
+  let cuaderno = crearCuaderno();
+  cuaderno = anotarPista(cuaderno, 'biblioteca', explorar(caso, 'biblioteca'));
+  cuaderno = anotarRespuesta(cuaderno, 'sobrina', 'donde', interrogar(caso, 'sobrina', 'donde'));
+  const acusacion = { culpable: 'sobrina', arma: 'veneno' };
+  const guardada = JSON.parse(JSON.stringify(resumirPartida(77, cuaderno, acusacion)));
+  const restaurada = restaurarPartida(guardada);
+  assert.deepEqual(restaurada.caso, caso);
+  assert.deepEqual(restaurada.cuaderno, cuaderno);
+  assert.deepEqual(restaurada.acusacion, acusacion);
+});
+
+test('restaurar ignora identificadores que ya no existen', () => {
+  const restaurada = restaurarPartida({
+    version: 1,
+    semilla: 5,
+    pistas: ['biblioteca', 'sotano-secreto'],
+    respuestas: [{ sospechoso: 'nadie', pregunta: 'donde' }, { sospechoso: 'sobrina', pregunta: 'otra' }],
+    acusacion: { culpable: 'nadie', habitacion: 'biblioteca' },
+  });
+  assert.deepEqual(restaurada.cuaderno.pistas.map((p) => p.habitacion), ['biblioteca']);
+  assert.equal(restaurada.cuaderno.respuestas.length, 0);
+  assert.deepEqual(restaurada.acusacion, { habitacion: 'biblioteca' });
+});
+
+test('el resumen de la partida guardada concuerda en número', () => {
+  assert.equal(resumenPartidaGuardada({ pistas: [1], respuestas: [] }),
+    'Tienes este caso a medias: 1 habitación registrada y 0 preguntas hechas.');
+  assert.equal(resumenPartidaGuardada({ pistas: [1, 2], respuestas: [1] }),
+    'Tienes este caso a medias: 2 habitaciones registradas y 1 pregunta hecha.');
 });

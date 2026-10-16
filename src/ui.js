@@ -7,7 +7,10 @@ import {
 import {
   habitaciones, sospechosos, armas, preguntas, textosResultado,
 } from './datos.js';
-import { resumirPartida, guardarPartida } from './guardado.js';
+import {
+  resumirPartida, guardarPartida, cargarPartida, borrarPartida,
+  restaurarPartida, resumenPartidaGuardada,
+} from './guardado.js';
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -205,19 +208,63 @@ function acusar() {
   mostrarPantalla('resultado');
 }
 
-function nuevaPartida(semilla) {
+function prepararPartida(semilla, { caso, cuaderno, acusacion }) {
   estado.semilla = semilla;
-  estado.caso = generarCaso(semilla);
-  estado.cuaderno = crearCuaderno();
+  estado.caso = caso;
+  estado.cuaderno = cuaderno;
   $('#hallazgo').hidden = true;
   pintarHabitaciones();
   estado.sospechoso = null;
   $('#bloque-preguntas').hidden = true;
   pintarSospechosos();
-  estado.acusacion = {};
+  estado.acusacion = acusacion;
   pintarAcusacion();
   $('#introduccion').textContent = introduccion(estado.caso);
+}
+
+function nuevaPartida(semilla) {
+  borrarPartida();
+  prepararPartida(semilla, { caso: generarCaso(semilla), cuaderno: crearCuaderno(), acusacion: {} });
+  mostrarInicio(false);
+}
+
+// Bloque de la pantalla de inicio para retomar una partida a medias.
+// Se crea aquí para no tocar index.html.
+function crearBloqueContinuar() {
+  const bloque = document.createElement('div');
+  bloque.id = 'bloque-continuar';
+  bloque.hidden = true;
+  const aviso = document.createElement('p');
+  aviso.id = 'aviso-continuar';
+  aviso.className = 'ayuda';
+  const continuar = crearBoton('Continuar', () => mostrarPantalla('mansion'));
+  continuar.classList.add('principal');
+  const nueva = crearBoton('Nueva partida', () => nuevaPartida(semillaInicial()));
+  bloque.append(aviso, continuar, nueva);
+  $('#pantalla-inicio h2').after(bloque);
+}
+
+function mostrarInicio(hayPartidaGuardada) {
+  $('#bloque-continuar').hidden = !hayPartidaGuardada;
+  // .boton fija display: block, así que el atributo hidden no bastaría.
+  $('#boton-empezar').style.display = hayPartidaGuardada ? 'none' : '';
+  if (hayPartidaGuardada) $('#aviso-continuar').textContent = resumenPartidaGuardada(estado.cuaderno);
   mostrarPantalla('inicio');
+}
+
+function arrancar() {
+  crearBloqueContinuar();
+  const guardada = cargarPartida();
+  if (guardada) {
+    try {
+      prepararPartida(guardada.semilla, restaurarPartida(guardada));
+      mostrarInicio(true);
+      return;
+    } catch {
+      // Partida guardada incompatible con esta versión del juego: se descarta.
+    }
+  }
+  nuevaPartida(semillaInicial());
 }
 
 document.querySelectorAll('.pestana').forEach((b) => {
@@ -231,4 +278,4 @@ $('#boton-nueva').addEventListener('click', () => {
   nuevaPartida(semillaAleatoria());
 });
 
-nuevaPartida(semillaInicial());
+arrancar();
