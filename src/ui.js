@@ -2,7 +2,7 @@
 import {
   generarCaso, introduccion, explorar, interrogar, nombreHabitacion,
   crearCuaderno, anotarPista, anotarRespuesta, comprobarAcusacion,
-  sospechoso, nombreArma,
+  sospechoso, nombreArma, dificultades,
 } from './juego.js';
 import {
   habitaciones, sospechosos, armas, preguntas, textosResultado,
@@ -11,7 +11,7 @@ import {
 const $ = (selector) => document.querySelector(selector);
 
 const estado = {
-  caso: null, sospechoso: null, cuaderno: crearCuaderno(), acusacion: {},
+  caso: null, sospechoso: null, cuaderno: crearCuaderno(), acusacion: {}, dificultad: 'normal',
 };
 
 function semillaInicial() {
@@ -196,8 +196,35 @@ function acusar() {
   mostrarPantalla('resultado');
 }
 
+const nombresDificultad = { facil: 'Fácil', normal: 'Normal', dificil: 'Difícil' };
+
+// Selector de dificultad en la pantalla de inicio: cambiarla rehace el caso con la misma semilla.
+function crearSelectorDificultad() {
+  const titulo = document.createElement('h3');
+  titulo.textContent = 'Dificultad';
+  const opciones = document.createElement('div');
+  opciones.id = 'opciones-dificultad';
+  opciones.className = 'opciones';
+  opciones.setAttribute('role', 'group');
+  opciones.setAttribute('aria-label', 'Dificultad');
+  $('#boton-empezar').before(titulo, opciones);
+}
+
+function pintarDificultad() {
+  $('#opciones-dificultad').replaceChildren(...dificultades.map((dificultad) => {
+    const boton = crearBoton(nombresDificultad[dificultad], () => {
+      estado.dificultad = dificultad;
+      nuevaPartida(estado.caso.semilla);
+    });
+    boton.classList.toggle('elegido', estado.dificultad === dificultad);
+    boton.setAttribute('aria-pressed', String(estado.dificultad === dificultad));
+    return boton;
+  }));
+}
+
 function nuevaPartida(semilla) {
-  estado.caso = generarCaso(semilla);
+  estado.caso = generarCaso(semilla, estado.dificultad);
+  pintarDificultad();
   estado.cuaderno = crearCuaderno();
   $('#hallazgo').hidden = true;
   pintarHabitaciones();
@@ -221,4 +248,5 @@ $('#boton-nueva').addEventListener('click', () => {
   nuevaPartida(semillaAleatoria());
 });
 
+crearSelectorDificultad();
 nuevaPartida(semillaInicial());

@@ -14,3 +14,5 @@
 - En difícil el culpable tampoco finge lo del arma, para que la única mentira sea la que exige cruzar fuentes (y el test lo pueda comprobar sin ambigüedad).
 - La pista engañosa lleva `enganosa: true` solo para los tests, como `miente: true`; la interfaz no lo muestra.
 - El test de 1.000 semillas recorre las tres dificultades con las mismas cuatro comprobaciones (solución única, mentira detectable, ninguna pista sola basta, hace falta explorar e interrogar). Pasó a la primera con las tres: el generador construye la solución única por diseño.
+- Selector de dificultad: lo crea ui.js en la pantalla de inicio (encima de «Empezar la investigación») con los botones y estilos que ya existían, para no tocar index.html ni styles.css. Normal está elegido por defecto; cambiarlo rehace el caso con la misma semilla y «Nueva partida» conserva la dificultad elegida. Comprobado en Chromium a 320 px: sin desbordamiento, partida difícil jugada hasta el resultado y sin errores.
+- La introducción sigue diciendo «las pistas no mienten»: en difícil también es verdad (el pañuelo está ahí de verdad; lo engañoso es la conclusión), así que no hace falta tocar ese texto de datos.js.
