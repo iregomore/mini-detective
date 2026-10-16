@@ -48,12 +48,21 @@ export function generarCaso(semilla, dificultad = 'normal') {
     motivo: elegir(motivos, aleatorio),
   };
   const escena = planificarEscena(caso, aleatorio);
-  const { hechosPistas, hechosTestigos } = repartirHechos(escena, aleatorio);
+  if (dificultad === 'facil') prepararFacil(escena);
+  const { hechosPistas, hechosTestigos } = repartirHechos(escena, dificultad, aleatorio);
   caso.ubicaciones = escena.ubicaciones;
   caso.pistas = colocarPistas(hechosPistas, aleatorio);
-  caso.respuestas = generarRespuestas(caso, hechosTestigos, aleatorio);
+  caso.respuestas = generarRespuestas(caso, escena, hechosTestigos, aleatorio);
   return caso;
 }
+
+// Textos propios de las dificultades fácil y difícil (datos.js queda fuera de esta zona de trabajo).
+export const textosDificultad = {
+  nadieAqui: () => 'La alfombra está recién cepillada y no tiene ni una huella: aquí no ha entrado nadie en toda la noche.',
+  nadieOtro: (habitacion) => `Encuentras una nota de la doncella: «Cerré ${habitacion} con llave al anochecer y nadie ha entrado desde entonces».`,
+  cuantosAqui: (numero) => `Hay ${numero} copas usadas y ${numero} sillas apartadas de la mesa: aquí estuvieron exactamente ${numero} personas, ni una más.`,
+  cuantosOtro: (habitacion, numero) => `Encuentras una nota de la doncella: «Llevé ${numero} copas a ${habitacion}, una por persona, y en toda la noche no entró nadie más».`,
+};
 
 // Los cuatro inocentes estaban por parejas en dos habitaciones que no son la del crimen.
 // Las demás armas y habitaciones se descartan con hechos repartidos entre pistas y testigos.
@@ -73,18 +82,37 @@ function planificarEscena(caso, aleatorio) {
     ubicaciones[uno] = { habitacion, con: [otro] };
     ubicaciones[otro] = { habitacion, con: [uno] };
   }
+  const libres = otrasHabitaciones.slice(inocentes.length / 2);
   const eliminaciones = [
     ...armas.filter((a) => a.id !== caso.arma).map((a) => ({ tipo: 'noArma', arma: a.id })),
-    ...otrasHabitaciones.slice(inocentes.length / 2).map((id) => ({ tipo: 'noLugar', habitacion: id })),
+    ...libres.map((id) => ({ tipo: 'noLugar', habitacion: id })),
   ];
-  return { ubicaciones, eliminaciones };
+  return { ubicaciones, libres, eliminaciones, forzadas: [] };
 }
 
-// Entre 3 y 4 hechos van a las habitaciones; el resto, a lo que vieron los inocentes.
-function repartirHechos(escena, aleatorio) {
+// Fácil: en una habitación libre no entró nadie (lo dice una pista), y el culpable
+// dirá que estuvo allí. Ese hecho sustituye al descarte de esa habitación.
+function prepararFacil(escena) {
+  const [vacia] = escena.libres;
+  escena.forzadas = [{ tipo: 'cuantos', habitacion: vacia, numero: 0 }];
+  escena.eliminaciones = escena.eliminaciones.filter((h) => h.habitacion !== vacia);
+  escena.mentira = { habitacion: vacia, con: [] };
+}
+
+// Cuántos hechos van a las habitaciones; el resto, a lo que vieron los inocentes.
+const pistasPorDificultad = {
+  facil: () => 5,
+  normal: (aleatorio) => 3 + Math.floor(aleatorio() * 2),
+  dificil: () => 2,
+};
+
+function repartirHechos(escena, dificultad, aleatorio) {
   const hechos = barajar(escena.eliminaciones, aleatorio);
-  const enPistas = 3 + Math.floor(aleatorio() * 2);
-  return { hechosPistas: hechos.slice(0, enPistas), hechosTestigos: hechos.slice(enPistas) };
+  const enPistas = pistasPorDificultad[dificultad](aleatorio) - escena.forzadas.length;
+  return {
+    hechosPistas: [...escena.forzadas, ...hechos.slice(0, enPistas)],
+    hechosTestigos: hechos.slice(enPistas),
+  };
 }
 
 function colocarPistas(hechos, aleatorio) {
@@ -98,25 +126,38 @@ function colocarPistas(hechos, aleatorio) {
 
 function textoPista(hecho, dondeEsta) {
   if (hecho.tipo === 'noArma') return textosPista.noArma(nombreArma(hecho.arma));
-  if (hecho.habitacion === dondeEsta) return textosPista.noLugarAqui();
-  return textosPista.noLugarOtro(nombreHabitacion(hecho.habitacion));
+  const aqui = hecho.habitacion === dondeEsta;
+  const lugar = nombreHabitacion(hecho.habitacion);
+  if (hecho.tipo === 'cuantos' && hecho.numero === 0) {
+    return aqui ? textosDificultad.nadieAqui() : textosDificultad.nadieOtro(lugar);
+  }
+  if (hecho.tipo === 'cuantos') {
+    return aqui ? textosDificultad.cuantosAqui(hecho.numero) : textosDificultad.cuantosOtro(lugar, hecho.numero);
+  }
+  return aqui ? textosPista.noLugarAqui() : textosPista.noLugarOtro(lugar);
 }
 
 const nombreSospechoso = (id) => sospechoso(id).nombre;
 
-function generarRespuestas(caso, hechosTestigos, aleatorio) {
+// Los hechos de los testigos se reparten en orden: si hay más hechos que inocentes,
+// alguno cuenta dos cosas.
+function generarRespuestas(caso, escena, hechosTestigos, aleatorio) {
   const inocentes = Object.keys(caso.ubicaciones);
   const testigos = barajar(inocentes, aleatorio);
+  const vistos = testigos.map(() => []);
+  hechosTestigos.forEach((hecho, i) => vistos[i % testigos.length].push(hecho));
   const respuestas = {};
   inocentes.forEach((id) => {
-    const hecho = hechosTestigos[testigos.indexOf(id)];
-    respuestas[id] = respuestasInocente(caso, id, hecho, aleatorio);
+    respuestas[id] = respuestasInocente(caso, id, vistos[testigos.indexOf(id)], aleatorio);
   });
-  respuestas[caso.culpable] = respuestasCulpable(caso, aleatorio);
+  const mentira = escena.mentira
+    ? { ...escena.mentira, finge: false, acusado: elegir(inocentes, aleatorio) }
+    : mentiraNormal(caso, aleatorio);
+  respuestas[caso.culpable] = respuestasCulpable(caso, mentira);
   return respuestas;
 }
 
-function respuestasInocente(caso, id, hechoVisto, aleatorio) {
+function respuestasInocente(caso, id, vistos, aleatorio) {
   const { habitacion, con } = caso.ubicaciones[id];
   const sospechado = elegir(sospechosos.filter((s) => s.id !== id), aleatorio).id;
   return {
@@ -125,8 +166,8 @@ function respuestasInocente(caso, id, hechoVisto, aleatorio) {
       hechos: [{ tipo: 'estaba', persona: id, habitacion, con }],
     },
     relacion: { texto: sospechoso(id).relacion, hechos: [] },
-    extrano: hechoVisto
-      ? { texto: textoVisto(hechoVisto), hechos: [hechoVisto] }
+    extrano: vistos.length
+      ? { texto: unirTextos(vistos.map(textoVisto)), hechos: vistos }
       : { texto: textosRespuesta.nadaRaro, hechos: [] },
     quien: { texto: textosRespuesta.opinionInocente(nombreSospechoso(sospechado)), hechos: [] },
   };
@@ -137,26 +178,38 @@ function textoVisto(hecho) {
   return textosRespuesta.vioLugar(nombreHabitacion(hecho.habitacion));
 }
 
-// El culpable miente sobre dónde estaba de forma que contradice a algún inocente,
+// Une varias frases de un testigo: «… Y otra cosa: …».
+function unirTextos(textos) {
+  return textos.map((texto, i) => {
+    if (i === 0) return texto;
+    const sinSi = texto.replace(/^Sí: /, '');
+    return `Y otra cosa: ${sinSi.charAt(0).toLowerCase()}${sinSi.slice(1)}`;
+  }).join(' ');
+}
+
+// Normal: el culpable miente sobre dónde estaba de forma que contradice a algún inocente,
 // y a veces también finge que el arma del crimen no se usó.
-function respuestasCulpable(caso, aleatorio) {
-  const id = caso.culpable;
+function mentiraNormal(caso, aleatorio) {
   const inocente = elegir(Object.keys(caso.ubicaciones), aleatorio);
   const { habitacion } = caso.ubicaciones[inocente];
   const finge = aleatorio() < 0.5;
   const acompanado = aleatorio() < 0.5;
+  return { habitacion, con: acompanado ? [inocente] : [], finge, acusado: inocente };
+}
+
+function respuestasCulpable(caso, { habitacion, con, solos, finge, acusado }) {
+  const id = caso.culpable;
+  const lugar = nombreHabitacion(habitacion);
+  const coartada = { tipo: 'estaba', persona: id, habitacion, con };
+  if (solos === false) coartada.solos = false;
   return {
-    donde: acompanado
-      ? {
-        texto: textosRespuesta.dondeConOtro(nombreHabitacion(habitacion), nombreSospechoso(inocente)),
-        hechos: [{ tipo: 'estaba', persona: id, habitacion, con: [inocente] }],
-        miente: true,
-      }
-      : {
-        texto: textosRespuesta.dondeSinCompania(nombreHabitacion(habitacion)),
-        hechos: [{ tipo: 'estaba', persona: id, habitacion, con: [] }],
-        miente: true,
-      },
+    donde: {
+      texto: con.length
+        ? textosRespuesta.dondeConOtro(lugar, nombreSospechoso(con[0]))
+        : textosRespuesta.dondeSinCompania(lugar),
+      hechos: [coartada],
+      miente: true,
+    },
     relacion: { texto: sospechoso(id).relacion, hechos: [] },
     extrano: finge
       ? {
@@ -165,7 +218,7 @@ function respuestasCulpable(caso, aleatorio) {
         miente: true,
       }
       : { texto: textosRespuesta.nadaRaro, hechos: [] },
-    quien: { texto: textosRespuesta.opinionCulpable(nombreSospechoso(inocente)), hechos: [] },
+    quien: { texto: textosRespuesta.opinionCulpable(nombreSospechoso(acusado)), hechos: [] },
   };
 }
 
@@ -203,6 +256,7 @@ export function solucionar(informacion) {
 function esCompatible(hechos, culpable, arma, habitacion) {
   const ubicacion = {};
   const grupos = {};
+  const cupos = {};
   const situar = (persona, lugar) => {
     if (ubicacion[persona] && ubicacion[persona] !== lugar) return false;
     ubicacion[persona] = lugar;
@@ -211,16 +265,28 @@ function esCompatible(hechos, culpable, arma, habitacion) {
   for (const hecho of hechos) {
     if (hecho.tipo === 'noArma' && hecho.arma === arma) return false;
     if (hecho.tipo === 'noLugar' && hecho.habitacion === habitacion) return false;
+    // El culpable estaba solo en la habitación del crimen: allí hubo exactamente una persona.
+    if (hecho.tipo === 'cuantos') {
+      if (hecho.habitacion === habitacion && hecho.numero !== 1) return false;
+      cupos[hecho.habitacion] = Math.min(cupos[hecho.habitacion] ?? Infinity, hecho.numero);
+    }
     if (hecho.tipo === 'estaba') {
-      const grupo = [hecho.persona, ...hecho.con].sort().join(',');
-      if (grupos[hecho.habitacion] && grupos[hecho.habitacion] !== grupo) return false;
-      grupos[hecho.habitacion] = grupo;
+      // Por defecto quien declara dice que solo estaban ellos; con `solos: false`, no lo asegura.
+      if (hecho.solos !== false) {
+        const grupo = [hecho.persona, ...hecho.con].sort().join(',');
+        if (grupos[hecho.habitacion] && grupos[hecho.habitacion] !== grupo) return false;
+        grupos[hecho.habitacion] = grupo;
+      }
       if (![hecho.persona, ...hecho.con].every((p) => situar(p, hecho.habitacion))) return false;
     }
   }
   for (const [persona, lugar] of Object.entries(ubicacion)) {
     if ((persona === culpable) !== (lugar === habitacion)) return false;
     if (grupos[lugar] && !grupos[lugar].split(',').includes(persona)) return false;
+  }
+  for (const [lugar, cupo] of Object.entries(cupos)) {
+    const presentes = Object.values(ubicacion).filter((l) => l === lugar).length;
+    if (presentes > cupo) return false;
   }
   return true;
 }
