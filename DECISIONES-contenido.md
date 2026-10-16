@@ -22,3 +22,4 @@
 - El resto de la introducción (instrucciones y «las pistas no mienten…») es igual en todas las versiones, para que las reglas se lean siempre.
 - El test de 1.000 semillas pasa sin cambios con el contenido nuevo. Le añado una comprobación: en esas semillas salen como solución los 8 culpables, las 7 armas y las 7 habitaciones, y cualquier personaje puede ser el inocente sin pareja.
 - Prueba de humo en Chromium sin interfaz a 320 px (sin tocar ui.js): la página carga sin errores en consola, muestra la introducción nueva y no hay desbordamiento horizontal.
+- La rama remota v2-contenido ya tenía el trabajo del agente de guardado (guardado.js y ui.js). Para no sobrescribirlo ni mezclarlo en este PR, subo el contenido a la rama de la sesión (ccr-67db38e7-s6fj4v) y abro el PR desde ahí. Lo he probado mezclado con esa rama: no hay conflictos y pasan los 59 tests.
