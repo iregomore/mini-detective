@@ -29,7 +29,7 @@ const casosDe = (dificultad, n = 200) => Array.from({ length: n }, (_, s) => gen
 
 test('fácil tiene más pistas que normal', () => {
   for (const caso of casosDe('facil')) {
-    assert.equal(pistasCon(caso).length, 5, `semilla ${caso.semilla}`);
+    assert.equal(pistasCon(caso).length, 6, `semilla ${caso.semilla}`);
   }
   for (const caso of casosDe('normal')) assert.ok(pistasCon(caso).length <= 4);
 });

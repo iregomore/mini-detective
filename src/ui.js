@@ -7,11 +7,16 @@ import {
 import {
   habitaciones, sospechosos, armas, preguntas, textosResultado,
 } from './datos.js';
+import {
+  resumirPartida, guardarPartida, cargarPartida, borrarPartida,
+  restaurarPartida, resumenPartidaGuardada,
+  cargarEstadisticas, registrarResultado, textoContador,
+} from './guardado.js';
 
 const $ = (selector) => document.querySelector(selector);
 
 const estado = {
-  caso: null, sospechoso: null, cuaderno: crearCuaderno(), acusacion: {}, dificultad: 'normal',
+  semilla: null, caso: null, sospechoso: null, cuaderno: crearCuaderno(), acusacion: {}, dificultad: 'normal',
 };
 
 function semillaInicial() {
@@ -21,6 +26,11 @@ function semillaInicial() {
 
 function semillaAleatoria() {
   return Math.floor(Math.random() * 2 ** 31) + 1;
+}
+
+// Se llama después de cada acción del jugador. Si no se puede guardar, el juego sigue igual.
+function guardar() {
+  guardarPartida(resumirPartida(estado.semilla, estado.cuaderno, estado.acusacion, estado.caso.dificultad));
 }
 
 function mostrarPantalla(nombre) {
@@ -73,6 +83,7 @@ function registrar(habitacion) {
   hallazgo.replaceChildren(titular(mayuscula(nombreHabitacion(habitacion))), texto);
   hallazgo.hidden = false;
   pintarHabitaciones(habitacion);
+  guardar();
 }
 
 const presentar = (s) => `${s.nombre}, ${s.rol}`;
@@ -115,6 +126,7 @@ function preguntar(pregunta) {
   respuesta.replaceChildren(titular(nombre), `«${texto}»`);
   respuesta.hidden = false;
   pintarPreguntas(pregunta);
+  guardar();
 }
 
 function entrada(titulo, texto, separador) {
@@ -167,6 +179,7 @@ function pintarAcusacion() {
       const boton = crearBoton(texto, () => {
         estado.acusacion = { ...estado.acusacion, [parte]: id };
         pintarAcusacion();
+        guardar();
       });
       boton.classList.toggle('elegido', estado.acusacion[parte] === id);
       boton.setAttribute('aria-pressed', String(estado.acusacion[parte] === id));
@@ -179,6 +192,8 @@ function pintarAcusacion() {
 
 function acusar() {
   const { gana, aciertos, relato } = comprobarAcusacion(estado.caso, estado.acusacion);
+  borrarPartida();
+  registrarResultado(gana);
   const nombres = {
     culpable: ['Culpable', sospechoso(estado.acusacion.culpable).nombre],
     arma: ['Arma', nombreArma(estado.acusacion.arma)],
@@ -196,10 +211,35 @@ function acusar() {
   mostrarPantalla('resultado');
 }
 
+function prepararPartida(semilla, { caso, cuaderno, acusacion }) {
+  estado.semilla = semilla;
+  estado.caso = caso;
+  estado.dificultad = caso.dificultad;
+  estado.cuaderno = cuaderno;
+  $('#hallazgo').hidden = true;
+  pintarHabitaciones();
+  estado.sospechoso = null;
+  $('#bloque-preguntas').hidden = true;
+  pintarSospechosos();
+  estado.acusacion = acusacion;
+  pintarAcusacion();
+  $('#introduccion').textContent = introduccion(estado.caso);
+}
+
+function nuevaPartida(semilla) {
+  borrarPartida();
+  const caso = generarCaso(semilla, estado.dificultad);
+  prepararPartida(semilla, { caso, cuaderno: crearCuaderno(), acusacion: {} });
+  mostrarInicio(false);
+}
+
 const nombresDificultad = { facil: 'Fácil', normal: 'Normal', dificil: 'Difícil' };
 
 // Selector de dificultad en la pantalla de inicio: cambiarla rehace el caso con la misma semilla.
+// Se crea aquí para no tocar index.html.
 function crearSelectorDificultad() {
+  const bloque = document.createElement('div');
+  bloque.id = 'bloque-dificultad';
   const titulo = document.createElement('h3');
   titulo.textContent = 'Dificultad';
   const opciones = document.createElement('div');
@@ -207,14 +247,15 @@ function crearSelectorDificultad() {
   opciones.className = 'opciones';
   opciones.setAttribute('role', 'group');
   opciones.setAttribute('aria-label', 'Dificultad');
-  $('#boton-empezar').before(titulo, opciones);
+  bloque.append(titulo, opciones);
+  $('#boton-empezar').before(bloque);
 }
 
 function pintarDificultad() {
   $('#opciones-dificultad').replaceChildren(...dificultades.map((dificultad) => {
     const boton = crearBoton(nombresDificultad[dificultad], () => {
       estado.dificultad = dificultad;
-      nuevaPartida(estado.caso.semilla);
+      nuevaPartida(estado.semilla);
     });
     boton.classList.toggle('elegido', estado.dificultad === dificultad);
     boton.setAttribute('aria-pressed', String(estado.dificultad === dificultad));
@@ -222,19 +263,57 @@ function pintarDificultad() {
   }));
 }
 
-function nuevaPartida(semilla) {
-  estado.caso = generarCaso(semilla, estado.dificultad);
+// Bloque de la pantalla de inicio para retomar una partida a medias.
+// Se crea aquí para no tocar index.html.
+function crearBloqueContinuar() {
+  const bloque = document.createElement('div');
+  bloque.id = 'bloque-continuar';
+  bloque.hidden = true;
+  const aviso = document.createElement('p');
+  aviso.id = 'aviso-continuar';
+  aviso.className = 'ayuda';
+  const continuar = crearBoton('Continuar', () => mostrarPantalla('mansion'));
+  continuar.classList.add('principal');
+  const nueva = crearBoton('Nueva partida', () => nuevaPartida(semillaInicial()));
+  bloque.append(aviso, continuar, nueva);
+  $('#pantalla-inicio h2').after(bloque);
+}
+
+// Contador de partidas ganadas y jugadas, al final de la pantalla de inicio.
+function crearContador() {
+  const contador = document.createElement('p');
+  contador.id = 'contador';
+  contador.className = 'ayuda';
+  $('#pantalla-inicio').append(contador);
+}
+
+function mostrarInicio(hayPartidaGuardada) {
+  $('#bloque-continuar').hidden = !hayPartidaGuardada;
+  // .boton fija display: block, así que el atributo hidden no bastaría.
+  $('#boton-empezar').style.display = hayPartidaGuardada ? 'none' : '';
+  // Con una partida a medias, la dificultad es la suya: el selector vuelve con «Nueva partida».
+  $('#bloque-dificultad').hidden = hayPartidaGuardada;
   pintarDificultad();
-  estado.cuaderno = crearCuaderno();
-  $('#hallazgo').hidden = true;
-  pintarHabitaciones();
-  estado.sospechoso = null;
-  $('#bloque-preguntas').hidden = true;
-  pintarSospechosos();
-  estado.acusacion = {};
-  pintarAcusacion();
-  $('#introduccion').textContent = introduccion(estado.caso);
+  if (hayPartidaGuardada) $('#aviso-continuar').textContent = resumenPartidaGuardada(estado.cuaderno);
+  $('#contador').textContent = textoContador(cargarEstadisticas());
   mostrarPantalla('inicio');
+}
+
+function arrancar() {
+  crearBloqueContinuar();
+  crearContador();
+  crearSelectorDificultad();
+  const guardada = cargarPartida();
+  if (guardada) {
+    try {
+      prepararPartida(guardada.semilla, restaurarPartida(guardada));
+      mostrarInicio(true);
+      return;
+    } catch {
+      // Partida guardada incompatible con esta versión del juego: se descarta.
+    }
+  }
+  nuevaPartida(semillaInicial());
 }
 
 document.querySelectorAll('.pestana').forEach((b) => {
@@ -248,5 +327,4 @@ $('#boton-nueva').addEventListener('click', () => {
   nuevaPartida(semillaAleatoria());
 });
 
-crearSelectorDificultad();
-nuevaPartida(semillaInicial());
+arrancar();

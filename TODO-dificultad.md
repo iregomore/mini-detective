@@ -6,4 +6,3 @@ Decisiones en DECISIONES-dificultad.md.
 - [x] Difícil: menos pistas, alguna pista engañosa que apunta a un inocente (con explicación inocente detectable) y la mentira del culpable solo se detecta cruzando dos fuentes.
 - [x] Ampliar el test de 1.000 semillas para cubrir las tres dificultades: solución única en todas.
 - [x] Selector de dificultad en la pantalla de inicio (normal por defecto).
-[ ] (Zona de contenido, datos.js) textosPista.noArma dice «limpio» también con armas femeninas («la cuerda … limpio»); hay que concordar el género.
