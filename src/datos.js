@@ -78,3 +78,13 @@ export const textosResultado = {
     + `Después, para despistar, dejó el cuerpo ${hallazgo}. `
     + `Mintió al decir: «${mentira.replace(/\.$/, '')}».`,
 };
+
+export const textosIntro = {
+  titulo: 'Mini Detective',
+  introduccion: ({ victima, descripcion, hallazgo }) =>
+    `Esta noche ha aparecido muerto ${victima}, ${descripcion}. `
+    + `Encontraron el cuerpo ${hallazgo}, pero el crimen ocurrió en alguna de las cinco habitaciones de la mansión. `
+    + 'Cinco personas estaban en la casa y una de ellas es culpable. '
+    + 'Explora las habitaciones, interroga a los sospechosos y acusa cuando lo tengas claro. '
+    + 'Recuerda: las pistas no mienten y los inocentes dicen la verdad… pero el culpable, no.',
+};

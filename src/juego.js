@@ -1,6 +1,6 @@
 // Lógica pura del juego. Sin acceso al DOM.
 import {
-  victimas, sospechosos, armas, habitaciones, lugaresHallazgo, motivos, textosPista, textosRespuesta, textosResultado,
+  victimas, sospechosos, armas, habitaciones, lugaresHallazgo, motivos, textosPista, textosRespuesta, textosResultado, textosIntro,
 } from './datos.js';
 
 // Generador pseudoaleatorio determinista (mulberry32).
@@ -245,5 +245,13 @@ export function relatoDelCrimen(caso) {
     motivo: caso.motivo,
     hallazgo: caso.hallazgo,
     mentira: caso.respuestas[caso.culpable].donde.texto,
+  });
+}
+
+export function introduccion(caso) {
+  return textosIntro.introduccion({
+    victima: caso.victima.nombre,
+    descripcion: caso.victima.descripcion,
+    hallazgo: caso.hallazgo,
   });
 }

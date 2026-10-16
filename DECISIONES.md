@@ -18,3 +18,5 @@
 - El generador construye la escena para que la solución sea única por diseño; el test de 1.000 semillas pasó sin necesidad de reintentos.
 - comprobarAcusacion devuelve también qué partes se acertaron (culpable, arma, habitación) para mostrarlo en el resultado; el relato incluye motivo, dónde dejó el cuerpo y la frase con la que mintió.
 - Los nombres de víctimas van sin artículo («Ezequiel Mora») para que las frases no queden como «a El doctor…».
+- Interfaz de una sola página: cada pantalla es una <section> y se muestra una cada vez. La semilla puede fijarse con ?semilla=N en la URL (útil para repetir un caso); si no, es aleatoria.
+- Los textos de la introducción se generan en juego.js (función pura) para poder probarlos con node --test.
