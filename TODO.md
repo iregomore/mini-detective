@@ -1,4 +1,4 @@
-[ ] Generar caso: elegir víctima, culpable, arma y habitación a partir de una semilla.
+- [x] Generar caso: elegir víctima, culpable, arma y habitación a partir de una semilla.
 [ ] Generar pistas en las habitaciones de forma que ninguna sola resuelva el caso.
 [ ] Generar respuestas de los sospechosos a las 4 preguntas; el culpable miente al menos una vez de forma detectable.
 [ ] Solucionador: función que, dada toda la información del caso, devuelve las combinaciones (culpable, arma, habitación) compatibles.
