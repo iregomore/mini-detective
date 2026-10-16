@@ -51,3 +51,11 @@ export const preguntas = [
   { id: 'extrano', texto: '¿Viste algo extraño?' },
   { id: 'quien', texto: '¿Quién crees que lo hizo?' },
 ];
+
+// Textos de las pistas que se encuentran en las habitaciones.
+export const textosPista = {
+  noArma: (arma) => `Encuentras ${arma} en su sitio, limpio y sin rastro de uso. No es el arma del crimen.`,
+  noLugarAqui: () => 'Todo está en perfecto orden y el polvo de los muebles no se ha movido. Aquí no ocurrió el crimen.',
+  noLugarOtro: (habitacion) => `Encuentras una nota de la doncella: «Estuve limpiando ${habitacion} toda la noche y allí no pasó nada».`,
+  nada: 'Buscas por todas partes, pero aquí no hay nada.',
+};
