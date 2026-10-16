@@ -6,3 +6,4 @@
 - La partida guardada lleva `version: 1`; si la versión no coincide o los datos están dañados, se ignora (cargarPartida devuelve null).
 - Las funciones aceptan el almacén como parámetro (por defecto localStorage) para poder probarlas con uno simulado.
 - Si localStorage no existe o lanza (modo privado, cuota llena, acceso bloqueado), guardar devuelve false y cargar devuelve null: el juego sigue funcionando sin guardar.
+- Se guarda tras registrar una habitación, hacer una pregunta o elegir algo en la acusación. Empezar una partida sin hacer nada no guarda: no habría nada que continuar.

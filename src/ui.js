@@ -7,11 +7,12 @@ import {
 import {
   habitaciones, sospechosos, armas, preguntas, textosResultado,
 } from './datos.js';
+import { resumirPartida, guardarPartida } from './guardado.js';
 
 const $ = (selector) => document.querySelector(selector);
 
 const estado = {
-  caso: null, sospechoso: null, cuaderno: crearCuaderno(), acusacion: {},
+  semilla: null, caso: null, sospechoso: null, cuaderno: crearCuaderno(), acusacion: {},
 };
 
 function semillaInicial() {
@@ -21,6 +22,11 @@ function semillaInicial() {
 
 function semillaAleatoria() {
   return Math.floor(Math.random() * 2 ** 31) + 1;
+}
+
+// Se llama después de cada acción del jugador. Si no se puede guardar, el juego sigue igual.
+function guardar() {
+  guardarPartida(resumirPartida(estado.semilla, estado.cuaderno, estado.acusacion));
 }
 
 function mostrarPantalla(nombre) {
@@ -73,6 +79,7 @@ function registrar(habitacion) {
   hallazgo.replaceChildren(titular(mayuscula(nombreHabitacion(habitacion))), texto);
   hallazgo.hidden = false;
   pintarHabitaciones(habitacion);
+  guardar();
 }
 
 const presentar = (s) => `${s.nombre}, ${s.rol}`;
@@ -115,6 +122,7 @@ function preguntar(pregunta) {
   respuesta.replaceChildren(titular(nombre), `«${texto}»`);
   respuesta.hidden = false;
   pintarPreguntas(pregunta);
+  guardar();
 }
 
 function entrada(titulo, texto, separador) {
@@ -167,6 +175,7 @@ function pintarAcusacion() {
       const boton = crearBoton(texto, () => {
         estado.acusacion = { ...estado.acusacion, [parte]: id };
         pintarAcusacion();
+        guardar();
       });
       boton.classList.toggle('elegido', estado.acusacion[parte] === id);
       boton.setAttribute('aria-pressed', String(estado.acusacion[parte] === id));
@@ -197,6 +206,7 @@ function acusar() {
 }
 
 function nuevaPartida(semilla) {
+  estado.semilla = semilla;
   estado.caso = generarCaso(semilla);
   estado.cuaderno = crearCuaderno();
   $('#hallazgo').hidden = true;
