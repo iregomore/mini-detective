@@ -6,7 +6,7 @@
 - [x] Comprobar acusación: devuelve si gana y el texto de "lo que pasó realmente".
 Interfaz
 - [x] Pantalla de inicio con la introducción del caso.
-[ ] Pantalla de mansión: elegir habitación y ver la pista (o "no hay nada").
+- [x] Pantalla de mansión: elegir habitación y ver la pista (o "no hay nada").
 [ ] Pantalla de interrogatorio: elegir sospechoso y pregunta, ver respuesta.
 [ ] Cuaderno con pistas y respuestas, accesible siempre.
 [ ] Pantalla de acusación y pantalla de resultado con botón de nueva partida.

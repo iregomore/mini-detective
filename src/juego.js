@@ -255,3 +255,9 @@ export function introduccion(caso) {
     hallazgo: caso.hallazgo,
   });
 }
+
+// Lo que el jugador encuentra al explorar una habitación.
+export function explorar(caso, habitacion) {
+  const pista = caso.pistas[habitacion];
+  return pista ? pista.texto : textosPista.nada;
+}

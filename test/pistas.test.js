@@ -40,3 +40,12 @@ test('los inocentes estaban por parejas fuera de la habitación del crimen', () 
     assert.equal(caso.ubicaciones[con[0]].habitacion, habitacion);
   }
 });
+
+test('explorar devuelve la pista o "no hay nada"', async () => {
+  const { explorar } = await import('../src/juego.js');
+  const { textosPista } = await import('../src/datos.js');
+  const caso = generarCaso(5);
+  for (const [id, pista] of Object.entries(caso.pistas)) {
+    assert.equal(explorar(caso, id), pista ? pista.texto : textosPista.nada);
+  }
+});

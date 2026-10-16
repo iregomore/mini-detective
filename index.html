@@ -10,6 +10,9 @@
 <body>
   <header class="cabecera">
     <h1>Mini Detective</h1>
+    <nav id="navegacion" class="navegacion" hidden>
+      <button class="pestana" data-pantalla="mansion">Mansión</button>
+    </nav>
   </header>
 
   <main>
@@ -17,6 +20,13 @@
       <h2>Un asesinato en la mansión</h2>
       <p id="introduccion" class="texto-caso"></p>
       <button id="boton-empezar" class="boton principal">Empezar la investigación</button>
+    </section>
+
+    <section id="pantalla-mansion" class="pantalla" hidden>
+      <h2>La mansión</h2>
+      <p class="ayuda">Elige una habitación para registrarla.</p>
+      <p id="hallazgo" class="texto-caso" hidden></p>
+      <div id="lista-habitaciones"></div>
     </section>
   </main>
 

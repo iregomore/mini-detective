@@ -83,3 +83,37 @@ h3 { font-size: 1.1rem; margin: 1em 0 0.5em; color: var(--suave); }
   font-weight: bold;
   text-align: center;
 }
+
+.navegacion {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  overflow-x: auto;
+}
+
+.navegacion[hidden] { display: none; }
+
+.pestana {
+  flex: 1 0 auto;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--tarjeta);
+  color: var(--texto);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.pestana.activa {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: #1d1a24;
+}
+
+.ayuda { color: var(--suave); margin: 0 0 8px; }
+
+.boton.elegido { border-color: var(--acento); box-shadow: inset 4px 0 0 var(--acento); }
+
+.boton .marca { float: right; color: var(--suave); font-size: 0.85rem; }
