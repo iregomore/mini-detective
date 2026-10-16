@@ -59,3 +59,15 @@ export const textosPista = {
   noLugarOtro: (habitacion) => `Encuentras una nota de la doncella: «Estuve limpiando ${habitacion} toda la noche y allí no pasó nada».`,
   nada: 'Buscas por todas partes, pero aquí no hay nada.',
 };
+
+// Textos de las respuestas de los sospechosos.
+export const textosRespuesta = {
+  dondeConPareja: (habitacion, pareja) => `Estaba en ${habitacion} con ${pareja}. Solo estábamos los dos.`,
+  dondeConOtro: (habitacion, otro) => `Estaba en ${habitacion} con ${otro}. Puede confirmarlo.`,
+  dondeSinCompania: (habitacion) => `Estaba en ${habitacion}, sin compañía. Necesitaba tranquilidad.`,
+  vioArma: (arma) => `Sí: vi ${arma} en su sitio durante toda la noche. Nadie se acercó.`,
+  vioLugar: (habitacion) => `Pasé por ${habitacion} a esa hora y no había nadie. Allí no ocurrió nada.`,
+  nadaRaro: 'No, no vi nada fuera de lo normal.',
+  opinionInocente: (otro) => `No lo sé… pero ${otro} actuaba de forma muy rara esta noche.`,
+  opinionCulpable: (otro) => `Yo apostaría por ${otro}. Nunca me ha dado buena espina.`,
+};

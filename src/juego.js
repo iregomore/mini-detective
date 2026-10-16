@@ -1,6 +1,6 @@
 // Lógica pura del juego. Sin acceso al DOM.
 import {
-  victimas, sospechosos, armas, habitaciones, lugaresHallazgo, motivos, textosPista,
+  victimas, sospechosos, armas, habitaciones, lugaresHallazgo, motivos, textosPista, textosRespuesta,
 } from './datos.js';
 
 // Generador pseudoaleatorio determinista (mulberry32).
@@ -47,7 +47,7 @@ export function generarCaso(semilla) {
   const { hechosPistas, hechosTestigos } = repartirHechos(escena, aleatorio);
   caso.ubicaciones = escena.ubicaciones;
   caso.pistas = colocarPistas(hechosPistas, aleatorio);
-  caso.hechosTestigos = hechosTestigos;
+  caso.respuestas = generarRespuestas(caso, hechosTestigos, aleatorio);
   return caso;
 }
 
@@ -96,4 +96,71 @@ function textoPista(hecho, dondeEsta) {
   if (hecho.tipo === 'noArma') return textosPista.noArma(nombreArma(hecho.arma));
   if (hecho.habitacion === dondeEsta) return textosPista.noLugarAqui();
   return textosPista.noLugarOtro(nombreHabitacion(hecho.habitacion));
+}
+
+const nombreSospechoso = (id) => sospechoso(id).nombre;
+
+function generarRespuestas(caso, hechosTestigos, aleatorio) {
+  const inocentes = Object.keys(caso.ubicaciones);
+  const testigos = barajar(inocentes, aleatorio);
+  const respuestas = {};
+  inocentes.forEach((id) => {
+    const hecho = hechosTestigos[testigos.indexOf(id)];
+    respuestas[id] = respuestasInocente(caso, id, hecho, aleatorio);
+  });
+  respuestas[caso.culpable] = respuestasCulpable(caso, aleatorio);
+  return respuestas;
+}
+
+function respuestasInocente(caso, id, hechoVisto, aleatorio) {
+  const { habitacion, con } = caso.ubicaciones[id];
+  const sospechado = elegir(sospechosos.filter((s) => s.id !== id), aleatorio).id;
+  return {
+    donde: {
+      texto: textosRespuesta.dondeConPareja(nombreHabitacion(habitacion), nombreSospechoso(con[0])),
+      hechos: [{ tipo: 'estaba', persona: id, habitacion, con }],
+    },
+    relacion: { texto: sospechoso(id).relacion, hechos: [] },
+    extrano: hechoVisto
+      ? { texto: textoVisto(hechoVisto), hechos: [hechoVisto] }
+      : { texto: textosRespuesta.nadaRaro, hechos: [] },
+    quien: { texto: textosRespuesta.opinionInocente(nombreSospechoso(sospechado)), hechos: [] },
+  };
+}
+
+function textoVisto(hecho) {
+  if (hecho.tipo === 'noArma') return textosRespuesta.vioArma(nombreArma(hecho.arma));
+  return textosRespuesta.vioLugar(nombreHabitacion(hecho.habitacion));
+}
+
+// El culpable miente sobre dónde estaba de forma que contradice a algún inocente,
+// y a veces también finge que el arma del crimen no se usó.
+function respuestasCulpable(caso, aleatorio) {
+  const id = caso.culpable;
+  const inocente = elegir(Object.keys(caso.ubicaciones), aleatorio);
+  const { habitacion } = caso.ubicaciones[inocente];
+  const finge = aleatorio() < 0.5;
+  const acompanado = aleatorio() < 0.5;
+  return {
+    donde: acompanado
+      ? {
+        texto: textosRespuesta.dondeConOtro(nombreHabitacion(habitacion), nombreSospechoso(inocente)),
+        hechos: [{ tipo: 'estaba', persona: id, habitacion, con: [inocente] }],
+        miente: true,
+      }
+      : {
+        texto: textosRespuesta.dondeSinCompania(nombreHabitacion(habitacion)),
+        hechos: [{ tipo: 'estaba', persona: id, habitacion, con: [] }],
+        miente: true,
+      },
+    relacion: { texto: sospechoso(id).relacion, hechos: [] },
+    extrano: finge
+      ? {
+        texto: textosRespuesta.vioArma(nombreArma(caso.arma)),
+        hechos: [{ tipo: 'noArma', arma: caso.arma }],
+        miente: true,
+      }
+      : { texto: textosRespuesta.nadaRaro, hechos: [] },
+    quien: { texto: textosRespuesta.opinionCulpable(nombreSospechoso(inocente)), hechos: [] },
+  };
 }

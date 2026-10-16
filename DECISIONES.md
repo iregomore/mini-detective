@@ -9,3 +9,6 @@
 - Escena: los 4 inocentes estaban por parejas en dos habitaciones distintas de la del crimen; el culpable estaba solo en la habitación del crimen.
 - Cada pista descarta un arma o una habitación (nunca un sospechoso), así que ninguna pista sola resuelve el caso. Hay 3 o 4 pistas; el resto de habitaciones están vacías.
 - Los descartes que no van a habitaciones los aporta algún inocente al responder «¿Viste algo extraño?».
+- Mentira detectable del culpable: dice que estaba en la habitación de una pareja de inocentes (solo o «con» uno de ellos), pero la pareja afirma que solo estaban ellos dos. A veces además dice que vio el arma del crimen sin usar (también se detecta: contradice los descartes de las demás armas).
+- «¿Qué relación tenías?» y «¿Quién crees que lo hizo?» son ambientación: no aportan hechos al solucionador. Las opiniones de los inocentes son impresiones («actuaba raro»), no afirmaciones falsas.
+- Las respuestas mentirosas llevan `miente: true` para los tests; la interfaz no lo muestra.
