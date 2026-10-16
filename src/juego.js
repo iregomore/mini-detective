@@ -164,3 +164,59 @@ function respuestasCulpable(caso, aleatorio) {
     quien: { texto: textosRespuesta.opinionCulpable(nombreSospechoso(inocente)), hechos: [] },
   };
 }
+
+// Toda la información que el jugador puede reunir: pistas y respuestas, con su fuente.
+export function informacionDelCaso(caso) {
+  const informacion = [];
+  for (const pista of Object.values(caso.pistas)) {
+    if (pista) informacion.push({ fuente: 'pista', hecho: pista.hecho });
+  }
+  for (const [id, respuestas] of Object.entries(caso.respuestas)) {
+    for (const respuesta of Object.values(respuestas)) {
+      for (const hecho of respuesta.hechos) informacion.push({ fuente: id, hecho });
+    }
+  }
+  return informacion;
+}
+
+// Devuelve las combinaciones (culpable, arma, habitación) compatibles con la información.
+// Hipótesis: las pistas y los inocentes dicen la verdad; el culpable puede mentir.
+export function solucionar(informacion) {
+  const compatibles = [];
+  for (const s of sospechosos) {
+    const hechos = informacion.filter((i) => i.fuente !== s.id).map((i) => i.hecho);
+    for (const a of armas) {
+      for (const h of habitaciones) {
+        if (esCompatible(hechos, s.id, a.id, h.id)) {
+          compatibles.push({ culpable: s.id, arma: a.id, habitacion: h.id });
+        }
+      }
+    }
+  }
+  return compatibles;
+}
+
+function esCompatible(hechos, culpable, arma, habitacion) {
+  const ubicacion = {};
+  const grupos = {};
+  const situar = (persona, lugar) => {
+    if (ubicacion[persona] && ubicacion[persona] !== lugar) return false;
+    ubicacion[persona] = lugar;
+    return true;
+  };
+  for (const hecho of hechos) {
+    if (hecho.tipo === 'noArma' && hecho.arma === arma) return false;
+    if (hecho.tipo === 'noLugar' && hecho.habitacion === habitacion) return false;
+    if (hecho.tipo === 'estaba') {
+      const grupo = [hecho.persona, ...hecho.con].sort().join(',');
+      if (grupos[hecho.habitacion] && grupos[hecho.habitacion] !== grupo) return false;
+      grupos[hecho.habitacion] = grupo;
+      if (![hecho.persona, ...hecho.con].every((p) => situar(p, hecho.habitacion))) return false;
+    }
+  }
+  for (const [persona, lugar] of Object.entries(ubicacion)) {
+    if ((persona === culpable) !== (lugar === habitacion)) return false;
+    if (grupos[lugar] && !grupos[lugar].split(',').includes(persona)) return false;
+  }
+  return true;
+}

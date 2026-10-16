@@ -12,3 +12,4 @@
 - Mentira detectable del culpable: dice que estaba en la habitación de una pareja de inocentes (solo o «con» uno de ellos), pero la pareja afirma que solo estaban ellos dos. A veces además dice que vio el arma del crimen sin usar (también se detecta: contradice los descartes de las demás armas).
 - «¿Qué relación tenías?» y «¿Quién crees que lo hizo?» son ambientación: no aportan hechos al solucionador. Las opiniones de los inocentes son impresiones («actuaba raro»), no afirmaciones falsas.
 - Las respuestas mentirosas llevan `miente: true` para los tests; la interfaz no lo muestra.
+- Solucionador por fuerza bruta (125 combinaciones): para cada sospechoso ignora sus declaraciones y comprueba que el resto de hechos es coherente con que estuviera solo en la habitación del crimen y los demás, fuera de ella.

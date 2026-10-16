@@ -1,7 +1,7 @@
 - [x] Generar caso: elegir víctima, culpable, arma y habitación a partir de una semilla.
 - [x] Generar pistas en las habitaciones de forma que ninguna sola resuelva el caso.
 - [x] Generar respuestas de los sospechosos a las 4 preguntas; el culpable miente al menos una vez de forma detectable.
-[ ] Solucionador: función que, dada toda la información del caso, devuelve las combinaciones (culpable, arma, habitación) compatibles.
+- [x] Solucionador: función que, dada toda la información del caso, devuelve las combinaciones (culpable, arma, habitación) compatibles.
 [ ] Test de 1.000 semillas: solución única, el culpable miente, ninguna pista sola basta. Ajustar el generador hasta que pase.
 [ ] Comprobar acusación: devuelve si gana y el texto de "lo que pasó realmente".
 Interfaz
