@@ -3,8 +3,8 @@
 export const victimas = [
   { nombre: 'Lord Alistair Pemberton', descripcion: 'el anciano dueño de la mansión' },
   { nombre: 'Doña Remedios Villalba', descripcion: 'la rica viuda que daba la fiesta' },
-  { nombre: 'El doctor Ezequiel Mora', descripcion: 'un famoso coleccionista de arte' },
-  { nombre: 'La condesa Inés de Altamira', descripcion: 'la heredera de la fortuna familiar' },
+  { nombre: 'Ezequiel Mora', descripcion: 'un famoso coleccionista de arte' },
+  { nombre: 'Inés de Altamira', descripcion: 'la condesa, heredera de la fortuna familiar' },
   { nombre: 'Don Fermín Castro', descripcion: 'el banquero más temido de la ciudad' },
 ];
 
@@ -70,4 +70,11 @@ export const textosRespuesta = {
   nadaRaro: 'No, no vi nada fuera de lo normal.',
   opinionInocente: (otro) => `No lo sé… pero ${otro} actuaba de forma muy rara esta noche.`,
   opinionCulpable: (otro) => `Yo apostaría por ${otro}. Nunca me ha dado buena espina.`,
+};
+
+export const textosResultado = {
+  relato: ({ culpable, rol, victima, arma, habitacion, motivo, hallazgo, mentira }) =>
+    `${culpable}, ${rol}, mató a ${victima} con ${arma} en ${habitacion} porque ${motivo}. `
+    + `Después, para despistar, dejó el cuerpo ${hallazgo}. `
+    + `Mintió al decir: «${mentira.replace(/\.$/, '')}».`,
 };

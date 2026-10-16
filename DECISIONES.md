@@ -16,3 +16,5 @@
 - «Ninguna pista sola basta» lo compruebo de dos formas: cada dato suelto (pista o respuesta) deja más de una combinación, y ni todas las pistas ni todas las respuestas por separado resuelven el caso.
 - «Mentira detectable» = si se creyera todo lo que dice el culpable, ninguna combinación sería coherente.
 - El generador construye la escena para que la solución sea única por diseño; el test de 1.000 semillas pasó sin necesidad de reintentos.
+- comprobarAcusacion devuelve también qué partes se acertaron (culpable, arma, habitación) para mostrarlo en el resultado; el relato incluye motivo, dónde dejó el cuerpo y la frase con la que mintió.
+- Los nombres de víctimas van sin artículo («Ezequiel Mora») para que las frases no queden como «a El doctor…».

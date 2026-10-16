@@ -1,6 +1,6 @@
 // Lógica pura del juego. Sin acceso al DOM.
 import {
-  victimas, sospechosos, armas, habitaciones, lugaresHallazgo, motivos, textosPista, textosRespuesta,
+  victimas, sospechosos, armas, habitaciones, lugaresHallazgo, motivos, textosPista, textosRespuesta, textosResultado,
 } from './datos.js';
 
 // Generador pseudoaleatorio determinista (mulberry32).
@@ -219,4 +219,31 @@ function esCompatible(hechos, culpable, arma, habitacion) {
     if (grupos[lugar] && !grupos[lugar].split(',').includes(persona)) return false;
   }
   return true;
+}
+
+export function comprobarAcusacion(caso, acusacion) {
+  const aciertos = {
+    culpable: acusacion.culpable === caso.culpable,
+    arma: acusacion.arma === caso.arma,
+    habitacion: acusacion.habitacion === caso.habitacion,
+  };
+  return {
+    gana: aciertos.culpable && aciertos.arma && aciertos.habitacion,
+    aciertos,
+    relato: relatoDelCrimen(caso),
+  };
+}
+
+export function relatoDelCrimen(caso) {
+  const culpable = sospechoso(caso.culpable);
+  return textosResultado.relato({
+    culpable: culpable.nombre,
+    rol: culpable.rol,
+    victima: caso.victima.nombre,
+    arma: nombreArma(caso.arma),
+    habitacion: nombreHabitacion(caso.habitacion),
+    motivo: caso.motivo,
+    hallazgo: caso.hallazgo,
+    mentira: caso.respuestas[caso.culpable].donde.texto,
+  });
 }
