@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generarCaso } from '../src/juego.js';
-import { sospechosos, preguntas } from '../src/datos.js';
+import { sospechosos, preguntas, armas, habitaciones } from '../src/datos.js';
 
 test('cada sospechoso responde a las 4 preguntas', () => {
   const caso = generarCaso(11);
@@ -37,11 +37,15 @@ test('la coartada del culpable choca con la de un inocente', () => {
 });
 
 test('los inocentes aportan los descartes que no están en las habitaciones', () => {
-  const caso = generarCaso(3);
-  const enPistas = Object.values(caso.pistas).filter(Boolean).length;
-  const enTestigos = Object.keys(caso.ubicaciones)
-    .filter((id) => caso.respuestas[id].extrano.hechos.length).length;
-  assert.equal(enPistas + enTestigos, 6);
+  const grupos = Math.ceil((sospechosos.length - 1) / 2);
+  const descartes = (armas.length - 1) + (habitaciones.length - 1 - grupos);
+  for (let s = 0; s < 200; s++) {
+    const caso = generarCaso(s);
+    const enPistas = Object.values(caso.pistas).filter(Boolean).length;
+    const enTestigos = Object.keys(caso.ubicaciones)
+      .filter((id) => caso.respuestas[id].extrano.hechos.length).length;
+    assert.equal(enPistas + enTestigos, descartes, `semilla ${s}`);
+  }
 });
 
 test('interrogar devuelve el texto de la respuesta', async () => {

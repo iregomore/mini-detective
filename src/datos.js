@@ -1,5 +1,9 @@
 // Datos del juego: personajes, armas, habitaciones y textos.
 
+const numeros = ['cero', 'una', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez'];
+export const enLetras = (n) => numeros[n] ?? String(n);
+const mayuscula = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1);
+
 export const victimas = [
   { nombre: 'Lord Alistair Pemberton', muerto: 'muerto', descripcion: 'el anciano dueño de la mansión' },
   { nombre: 'Doña Remedios Villalba', muerto: 'muerta', descripcion: 'la rica viuda que daba la fiesta' },
@@ -85,10 +89,10 @@ export const textosResultado = {
 
 export const textosIntro = {
   titulo: 'Mini Detective',
-  introduccion: ({ victima, muerto, descripcion, hallazgo }) =>
+  introduccion: ({ victima, muerto, descripcion, hallazgo, numHabitaciones, numSospechosos }) =>
     `Esta noche ha aparecido ${muerto} ${victima}, ${descripcion}. `
-    + `Encontraron el cuerpo ${hallazgo}, pero el crimen ocurrió en alguna de las cinco habitaciones de la mansión. `
-    + 'Cinco personas estaban en la casa y una de ellas es culpable. '
+    + `Encontraron el cuerpo ${hallazgo}, pero el crimen ocurrió en alguna de las ${enLetras(numHabitaciones)} habitaciones de la mansión. `
+    + `${mayuscula(enLetras(numSospechosos))} personas estaban en la casa y una de ellas es culpable. `
     + 'Explora las habitaciones, interroga a los sospechosos y acusa cuando lo tengas claro. '
     + 'Recuerda: las pistas no mienten y los inocentes dicen la verdad… pero el culpable, no.',
 };
