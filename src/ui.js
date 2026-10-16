@@ -2,7 +2,7 @@
 import {
   generarCaso, introduccion, explorar, interrogar, nombreHabitacion,
   crearCuaderno, anotarPista, anotarRespuesta, comprobarAcusacion,
-  sospechoso, nombreArma,
+  sospechoso, nombreArma, dificultades,
 } from './juego.js';
 import {
   habitaciones, sospechosos, armas, preguntas, textosResultado,
@@ -16,7 +16,7 @@ import {
 const $ = (selector) => document.querySelector(selector);
 
 const estado = {
-  semilla: null, caso: null, sospechoso: null, cuaderno: crearCuaderno(), acusacion: {},
+  semilla: null, caso: null, sospechoso: null, cuaderno: crearCuaderno(), acusacion: {}, dificultad: 'normal',
 };
 
 function semillaInicial() {
@@ -30,7 +30,7 @@ function semillaAleatoria() {
 
 // Se llama después de cada acción del jugador. Si no se puede guardar, el juego sigue igual.
 function guardar() {
-  guardarPartida(resumirPartida(estado.semilla, estado.cuaderno, estado.acusacion));
+  guardarPartida(resumirPartida(estado.semilla, estado.cuaderno, estado.acusacion, estado.caso.dificultad));
 }
 
 function mostrarPantalla(nombre) {
@@ -214,6 +214,7 @@ function acusar() {
 function prepararPartida(semilla, { caso, cuaderno, acusacion }) {
   estado.semilla = semilla;
   estado.caso = caso;
+  estado.dificultad = caso.dificultad;
   estado.cuaderno = cuaderno;
   $('#hallazgo').hidden = true;
   pintarHabitaciones();
@@ -227,8 +228,39 @@ function prepararPartida(semilla, { caso, cuaderno, acusacion }) {
 
 function nuevaPartida(semilla) {
   borrarPartida();
-  prepararPartida(semilla, { caso: generarCaso(semilla), cuaderno: crearCuaderno(), acusacion: {} });
+  const caso = generarCaso(semilla, estado.dificultad);
+  prepararPartida(semilla, { caso, cuaderno: crearCuaderno(), acusacion: {} });
   mostrarInicio(false);
+}
+
+const nombresDificultad = { facil: 'Fácil', normal: 'Normal', dificil: 'Difícil' };
+
+// Selector de dificultad en la pantalla de inicio: cambiarla rehace el caso con la misma semilla.
+// Se crea aquí para no tocar index.html.
+function crearSelectorDificultad() {
+  const bloque = document.createElement('div');
+  bloque.id = 'bloque-dificultad';
+  const titulo = document.createElement('h3');
+  titulo.textContent = 'Dificultad';
+  const opciones = document.createElement('div');
+  opciones.id = 'opciones-dificultad';
+  opciones.className = 'opciones';
+  opciones.setAttribute('role', 'group');
+  opciones.setAttribute('aria-label', 'Dificultad');
+  bloque.append(titulo, opciones);
+  $('#boton-empezar').before(bloque);
+}
+
+function pintarDificultad() {
+  $('#opciones-dificultad').replaceChildren(...dificultades.map((dificultad) => {
+    const boton = crearBoton(nombresDificultad[dificultad], () => {
+      estado.dificultad = dificultad;
+      nuevaPartida(estado.semilla);
+    });
+    boton.classList.toggle('elegido', estado.dificultad === dificultad);
+    boton.setAttribute('aria-pressed', String(estado.dificultad === dificultad));
+    return boton;
+  }));
 }
 
 // Bloque de la pantalla de inicio para retomar una partida a medias.
@@ -259,6 +291,9 @@ function mostrarInicio(hayPartidaGuardada) {
   $('#bloque-continuar').hidden = !hayPartidaGuardada;
   // .boton fija display: block, así que el atributo hidden no bastaría.
   $('#boton-empezar').style.display = hayPartidaGuardada ? 'none' : '';
+  // Con una partida a medias, la dificultad es la suya: el selector vuelve con «Nueva partida».
+  $('#bloque-dificultad').hidden = hayPartidaGuardada;
+  pintarDificultad();
   if (hayPartidaGuardada) $('#aviso-continuar').textContent = resumenPartidaGuardada(estado.cuaderno);
   $('#contador').textContent = textoContador(cargarEstadisticas());
   mostrarPantalla('inicio');
@@ -267,6 +302,7 @@ function mostrarInicio(hayPartidaGuardada) {
 function arrancar() {
   crearBloqueContinuar();
   crearContador();
+  crearSelectorDificultad();
   const guardada = cargarPartida();
   if (guardada) {
     try {

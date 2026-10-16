@@ -2,7 +2,7 @@
 // Todo va envuelto en try/catch: si el almacenamiento falla, el juego sigue sin guardar.
 
 import {
-  generarCaso, explorar, interrogar, crearCuaderno, anotarPista, anotarRespuesta,
+  generarCaso, dificultades, explorar, interrogar, crearCuaderno, anotarPista, anotarRespuesta,
 } from './juego.js';
 import { habitaciones, sospechosos, armas, preguntas } from './datos.js';
 
@@ -50,10 +50,11 @@ const esEnteroPositivo = (valor) => Number.isInteger(valor) && valor > 0;
 
 // Resumen guardable de la partida: la semilla y los identificadores de lo descubierto.
 // Los textos no se guardan: se regeneran a partir de la semilla al cargar.
-export function resumirPartida(semilla, cuaderno, acusacion = {}) {
+export function resumirPartida(semilla, cuaderno, acusacion = {}, dificultad = 'normal') {
   return {
     version: VERSION,
     semilla,
+    dificultad,
     pistas: cuaderno.pistas.map((p) => p.habitacion),
     respuestas: cuaderno.respuestas.map((r) => ({ sospechoso: r.sospechoso, pregunta: r.pregunta })),
     acusacion: { ...acusacion },
@@ -63,6 +64,7 @@ export function resumirPartida(semilla, cuaderno, acusacion = {}) {
 function partidaValida(partida) {
   return partida?.version === VERSION
     && esEnteroPositivo(partida.semilla)
+    && (partida.dificultad === undefined || dificultades.includes(partida.dificultad))
     && Array.isArray(partida.pistas) && partida.pistas.every(esTexto)
     && Array.isArray(partida.respuestas)
     && partida.respuestas.every((r) => esTexto(r?.sospechoso) && esTexto(r?.pregunta))
@@ -88,7 +90,7 @@ const existe = (lista, id) => lista.some((elemento) => elemento.id === id);
 // Reconstruye el caso, el cuaderno y la acusación a partir de una partida guardada.
 // Los identificadores que ya no existan en los datos se ignoran.
 export function restaurarPartida(partida) {
-  const caso = generarCaso(partida.semilla);
+  const caso = generarCaso(partida.semilla, partida.dificultad ?? 'normal');
   let cuaderno = crearCuaderno();
   for (const habitacion of partida.pistas.filter((id) => existe(habitaciones, id))) {
     cuaderno = anotarPista(cuaderno, habitacion, explorar(caso, habitacion));

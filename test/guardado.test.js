@@ -32,10 +32,11 @@ function partidaDeEjemplo() {
   return resumirPartida(42, cuaderno, { culpable: 'socio' });
 }
 
-test('resumirPartida guarda solo la semilla y los identificadores', () => {
+test('resumirPartida guarda solo la semilla, la dificultad y los identificadores', () => {
   assert.deepEqual(partidaDeEjemplo(), {
     version: 1,
     semilla: 42,
+    dificultad: 'normal',
     pistas: ['cocina'],
     respuestas: [{ sospechoso: 'socio', pregunta: 'donde' }],
     acusacion: { culpable: 'socio' },
@@ -142,4 +143,17 @@ test('el texto del contador', () => {
   assert.equal(textoContador({ jugadas: 0, ganadas: 0 }), 'Todavía no has cerrado ningún caso.');
   assert.equal(textoContador({ jugadas: 1, ganadas: 0 }), 'Casos resueltos: 0 de 1 jugado.');
   assert.equal(textoContador({ jugadas: 5, ganadas: 3 }), 'Casos resueltos: 3 de 5 jugados.');
+});
+
+test('la partida guardada recuerda la dificultad', () => {
+  const almacen = almacenSimulado();
+  guardarPartida(resumirPartida(42, crearCuaderno(), {}, 'dificil'), almacen);
+  const { caso } = restaurarPartida(cargarPartida(almacen));
+  assert.equal(caso.dificultad, 'dificil');
+});
+
+test('una partida guardada sin dificultad (versión anterior) se carga como normal', () => {
+  const { dificultad, ...antigua } = resumirPartida(42, crearCuaderno());
+  assert.equal(dificultad, 'normal');
+  assert.equal(restaurarPartida(antigua).caso.dificultad, 'normal');
 });
