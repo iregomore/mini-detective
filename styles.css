@@ -86,23 +86,23 @@ h3 { font-size: 1.1rem; margin: 1em 0 0.5em; color: var(--suave); }
 
 .navegacion {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   margin-top: 8px;
-  overflow-x: auto;
 }
 
 .navegacion[hidden] { display: none; }
 
 .pestana {
-  flex: 1 0 auto;
-  min-height: 40px;
-  padding: 6px 10px;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px 2px;
   border: 1px solid var(--borde);
   border-radius: 999px;
   background: var(--tarjeta);
   color: var(--texto);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
 }
 

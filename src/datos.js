@@ -1,18 +1,18 @@
 // Datos del juego: personajes, armas, habitaciones y textos.
 
 export const victimas = [
-  { nombre: 'Lord Alistair Pemberton', descripcion: 'el anciano dueño de la mansión' },
-  { nombre: 'Doña Remedios Villalba', descripcion: 'la rica viuda que daba la fiesta' },
-  { nombre: 'Ezequiel Mora', descripcion: 'un famoso coleccionista de arte' },
-  { nombre: 'Inés de Altamira', descripcion: 'la condesa, heredera de la fortuna familiar' },
-  { nombre: 'Don Fermín Castro', descripcion: 'el banquero más temido de la ciudad' },
+  { nombre: 'Lord Alistair Pemberton', muerto: 'muerto', descripcion: 'el anciano dueño de la mansión' },
+  { nombre: 'Doña Remedios Villalba', muerto: 'muerta', descripcion: 'la rica viuda que daba la fiesta' },
+  { nombre: 'Ezequiel Mora', muerto: 'muerto', descripcion: 'un famoso coleccionista de arte' },
+  { nombre: 'Inés de Altamira', muerto: 'muerta', descripcion: 'la condesa, heredera de la fortuna familiar' },
+  { nombre: 'Don Fermín Castro', muerto: 'muerto', descripcion: 'el banquero más temido de la ciudad' },
 ];
 
 export const sospechosos = [
   { id: 'mayordomo', nombre: 'Benito', rol: 'el mayordomo', relacion: 'Le serví durante veinte años. Era exigente, pero justo.' },
   { id: 'sobrina', nombre: 'Clara', rol: 'la sobrina', relacion: 'Soy su única sobrina. Me pagaba los estudios.' },
   { id: 'socio', nombre: 'Rodrigo', rol: 'el socio', relacion: 'Llevábamos juntos el negocio familiar desde hace años.' },
-  { id: 'medica', nombre: 'Lucía', rol: 'la médica', relacion: 'Era su médica de cabecera. Lo visitaba cada semana.' },
+  { id: 'medica', nombre: 'Lucía', rol: 'la médica', relacion: 'Era su médica de cabecera. Pasaba consulta en la casa cada semana.' },
   { id: 'jardinero', nombre: 'Tomás', rol: 'el jardinero', relacion: 'Cuido sus jardines. Apenas hablábamos.' },
 ];
 
@@ -40,7 +40,7 @@ export const lugaresHallazgo = [
 
 export const motivos = [
   'quería cobrar la herencia cuanto antes',
-  'iba a ser despedido y desheredado',
+  'iba a quedarse sin trabajo y sin herencia',
   'le debía una fortuna que no podía pagar',
   'había descubierto un secreto que podía arruinarle',
 ];
@@ -85,8 +85,8 @@ export const textosResultado = {
 
 export const textosIntro = {
   titulo: 'Mini Detective',
-  introduccion: ({ victima, descripcion, hallazgo }) =>
-    `Esta noche ha aparecido muerto ${victima}, ${descripcion}. `
+  introduccion: ({ victima, muerto, descripcion, hallazgo }) =>
+    `Esta noche ha aparecido ${muerto} ${victima}, ${descripcion}. `
     + `Encontraron el cuerpo ${hallazgo}, pero el crimen ocurrió en alguna de las cinco habitaciones de la mansión. `
     + 'Cinco personas estaban en la casa y una de ellas es culpable. '
     + 'Explora las habitaciones, interroga a los sospechosos y acusa cuando lo tengas claro. '

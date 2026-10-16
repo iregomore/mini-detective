@@ -251,6 +251,7 @@ export function relatoDelCrimen(caso) {
 export function introduccion(caso) {
   return textosIntro.introduccion({
     victima: caso.victima.nombre,
+    muerto: caso.victima.muerto,
     descripcion: caso.victima.descripcion,
     hallazgo: caso.hallazgo,
   });

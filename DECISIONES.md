@@ -22,3 +22,5 @@
 - Los textos de la introducción se generan en juego.js (función pura) para poder probarlos con node --test.
 - El cuaderno se rellena solo al registrar habitaciones y hacer preguntas; agrupa las declaraciones por sospechoso. Es una pestaña fija de la barra superior para que esté siempre accesible.
 - Acusación de una sola oportunidad: el botón se activa al elegir las tres cosas; el resultado muestra qué se acertó, el relato y «Nueva partida» (que quita ?semilla= de la URL y genera un caso aleatorio).
+- Revisión en móvil con Chromium sin interfaz a 320 y 375 px de ancho: sin desbordamiento horizontal, botones de al menos 44 px de alto y texto base de 18 px. Las cuatro pestañas se reparten el ancho para que quepan en 320 px.
+- Concordancia de género: cada víctima indica «muerto/muerta»; textos de sospechosos y motivos redactados para no depender del género.

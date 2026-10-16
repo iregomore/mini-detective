@@ -10,6 +10,6 @@ Interfaz
 - [x] Pantalla de interrogatorio: elegir sospechoso y pregunta, ver respuesta.
 - [x] Cuaderno con pistas y respuestas, accesible siempre.
 - [x] Pantalla de acusación y pantalla de resultado con botón de nueva partida.
-[ ] Revisar que todo se lee bien en pantalla de móvil en vertical.
+- [x] Revisar que todo se lee bien en pantalla de móvil en vertical.
 Publicación
 [ ] Configurar GitHub Pages (workflow o instrucciones en README.md) y comprobar que los criterios de "terminado" de SPEC.md se cumplen.
