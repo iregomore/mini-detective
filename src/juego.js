@@ -32,10 +32,14 @@ export const nombreArma = (id) => armas.find((a) => a.id === id).nombre;
 export const nombreHabitacion = (id) => habitaciones.find((h) => h.id === id).nombre;
 export const sospechoso = (id) => sospechosos.find((s) => s.id === id);
 
-export function generarCaso(semilla) {
+export const dificultades = ['facil', 'normal', 'dificil'];
+
+export function generarCaso(semilla, dificultad = 'normal') {
+  if (!dificultades.includes(dificultad)) throw new Error(`Dificultad desconocida: ${dificultad}`);
   const aleatorio = crearAleatorio(semilla);
   const caso = {
     semilla,
+    dificultad,
     victima: elegir(victimas, aleatorio),
     hallazgo: elegir(lugaresHallazgo, aleatorio),
     culpable: elegir(sospechosos, aleatorio).id,
