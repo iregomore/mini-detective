@@ -1,12 +1,13 @@
 // Conecta la lógica del juego con la interfaz.
 import {
   generarCaso, introduccion, explorar, interrogar, nombreHabitacion,
+  crearCuaderno, anotarPista, anotarRespuesta,
 } from './juego.js';
 import { habitaciones, sospechosos, preguntas } from './datos.js';
 
 const $ = (selector) => document.querySelector(selector);
 
-const estado = { caso: null, exploradas: new Set(), sospechoso: null };
+const estado = { caso: null, sospechoso: null, cuaderno: crearCuaderno() };
 
 function semillaInicial() {
   const deUrl = Number(new URLSearchParams(location.search).get('semilla'));
@@ -21,6 +22,7 @@ function mostrarPantalla(nombre) {
   document.querySelectorAll('.pantalla').forEach((p) => {
     p.hidden = p.id !== `pantalla-${nombre}`;
   });
+  if (nombre === 'cuaderno') pintarCuaderno();
   document.querySelectorAll('.pestana').forEach((b) => {
     b.classList.toggle('activa', b.dataset.pantalla === nombre);
   });
@@ -36,9 +38,9 @@ function crearBoton(texto, alPulsar) {
   return boton;
 }
 
-function titular(texto) {
+function titular(texto, separador = ': ') {
   const fuerte = document.createElement('strong');
-  fuerte.textContent = `${texto}: `;
+  fuerte.textContent = `${texto}${separador}`;
   return fuerte;
 }
 
@@ -49,7 +51,7 @@ function pintarHabitaciones(elegida) {
   lista.replaceChildren(...habitaciones.map((h) => {
     const boton = crearBoton(mayuscula(h.nombre), () => registrar(h.id));
     boton.classList.toggle('elegido', h.id === elegida);
-    if (estado.exploradas.has(h.id)) {
+    if (estado.cuaderno.pistas.some((p) => p.habitacion === h.id)) {
       const marca = document.createElement('span');
       marca.className = 'marca';
       marca.textContent = 'registrada';
@@ -60,9 +62,10 @@ function pintarHabitaciones(elegida) {
 }
 
 function registrar(habitacion) {
-  estado.exploradas.add(habitacion);
+  const texto = explorar(estado.caso, habitacion);
+  estado.cuaderno = anotarPista(estado.cuaderno, habitacion, texto);
   const hallazgo = $('#hallazgo');
-  hallazgo.replaceChildren(titular(mayuscula(nombreHabitacion(habitacion))), explorar(estado.caso, habitacion));
+  hallazgo.replaceChildren(titular(mayuscula(nombreHabitacion(habitacion))), texto);
   hallazgo.hidden = false;
   pintarHabitaciones(habitacion);
 }
@@ -92,21 +95,64 @@ function pintarPreguntas(elegida) {
   $('#lista-preguntas').replaceChildren(...preguntas.map((p) => {
     const boton = crearBoton(p.texto, () => preguntar(p.id));
     boton.classList.toggle('elegido', p.id === elegida);
+    const hecha = estado.cuaderno.respuestas
+      .some((r) => r.sospechoso === estado.sospechoso && r.pregunta === p.id);
+    if (hecha) boton.classList.add('hecha');
     return boton;
   }));
 }
 
 function preguntar(pregunta) {
   const nombre = sospechosos.find((s) => s.id === estado.sospechoso).nombre;
+  const texto = interrogar(estado.caso, estado.sospechoso, pregunta);
+  estado.cuaderno = anotarRespuesta(estado.cuaderno, estado.sospechoso, pregunta, texto);
   const respuesta = $('#respuesta');
-  respuesta.replaceChildren(titular(nombre), `«${interrogar(estado.caso, estado.sospechoso, pregunta)}»`);
+  respuesta.replaceChildren(titular(nombre), `«${texto}»`);
   respuesta.hidden = false;
   pintarPreguntas(pregunta);
 }
 
+function entrada(titulo, texto, separador) {
+  const parrafo = document.createElement('p');
+  parrafo.className = 'nota';
+  parrafo.append(titular(titulo, separador), texto);
+  return parrafo;
+}
+
+function vacio(texto) {
+  const parrafo = document.createElement('p');
+  parrafo.className = 'ayuda';
+  parrafo.textContent = texto;
+  return parrafo;
+}
+
+function pintarCuaderno() {
+  const { pistas, respuestas } = estado.cuaderno;
+  $('#cuaderno-pistas').replaceChildren(...(pistas.length
+    ? pistas.map((p) => entrada(mayuscula(nombreHabitacion(p.habitacion)), p.texto))
+    : [vacio('Todavía no has registrado ninguna habitación.')]));
+  const porSospechoso = sospechosos
+    .map((s) => ({ s, suyas: respuestas.filter((r) => r.sospechoso === s.id) }))
+    .filter(({ suyas }) => suyas.length);
+  $('#cuaderno-respuestas').replaceChildren(...(porSospechoso.length
+    ? porSospechoso.map(({ s, suyas }) => {
+      const bloque = document.createElement('div');
+      bloque.className = 'texto-caso';
+      const cabecera = document.createElement('h4');
+      cabecera.textContent = presentar(s);
+      bloque.append(cabecera, ...suyas.map((r) => entrada(
+        preguntas.find((p) => p.id === r.pregunta).texto,
+        `«${r.texto}»`,
+        ' ',
+      )));
+      return bloque;
+    })
+    : [vacio('Todavía no has interrogado a nadie.')]));
+}
+
 function nuevaPartida(semilla) {
   estado.caso = generarCaso(semilla);
-  estado.exploradas = new Set();
+  estado.cuaderno = crearCuaderno();
   $('#hallazgo').hidden = true;
   pintarHabitaciones();
   estado.sospechoso = null;

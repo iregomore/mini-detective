@@ -119,3 +119,15 @@ h3 { font-size: 1.1rem; margin: 1em 0 0.5em; color: var(--suave); }
 .boton .marca { float: right; color: var(--suave); font-size: 0.85rem; }
 
 #bloque-preguntas { scroll-margin-top: 110px; }
+
+.nota { margin: 0 0 10px; }
+.nota strong { display: block; color: var(--acento); font-size: 0.9rem; }
+#cuaderno-pistas .nota {
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 10px 14px;
+}
+h4 { margin: 0 0 8px; font-size: 1rem; }
+.boton.hecha::after { content: ' ✓'; color: var(--suave); }
+.texto-caso > .nota:last-child { margin-bottom: 0; }

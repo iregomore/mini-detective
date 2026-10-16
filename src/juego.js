@@ -265,3 +265,21 @@ export function explorar(caso, habitacion) {
 export function interrogar(caso, sospechosoId, preguntaId) {
   return caso.respuestas[sospechosoId][preguntaId].texto;
 }
+
+// Cuaderno del jugador: lo que ha descubierto, en el orden en que lo descubrió y sin repetir.
+export function crearCuaderno() {
+  return { pistas: [], respuestas: [] };
+}
+
+export function anotarPista(cuaderno, habitacion, texto) {
+  if (cuaderno.pistas.some((p) => p.habitacion === habitacion)) return cuaderno;
+  return { ...cuaderno, pistas: [...cuaderno.pistas, { habitacion, texto }] };
+}
+
+export function anotarRespuesta(cuaderno, sospechosoId, preguntaId, texto) {
+  const repetida = cuaderno.respuestas
+    .some((r) => r.sospechoso === sospechosoId && r.pregunta === preguntaId);
+  if (repetida) return cuaderno;
+  const respuesta = { sospechoso: sospechosoId, pregunta: preguntaId, texto };
+  return { ...cuaderno, respuestas: [...cuaderno.respuestas, respuesta] };
+}

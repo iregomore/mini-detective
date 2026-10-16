@@ -20,3 +20,4 @@
 - Los nombres de víctimas van sin artículo («Ezequiel Mora») para que las frases no queden como «a El doctor…».
 - Interfaz de una sola página: cada pantalla es una <section> y se muestra una cada vez. La semilla puede fijarse con ?semilla=N en la URL (útil para repetir un caso); si no, es aleatoria.
 - Los textos de la introducción se generan en juego.js (función pura) para poder probarlos con node --test.
+- El cuaderno se rellena solo al registrar habitaciones y hacer preguntas; agrupa las declaraciones por sospechoso. Es una pestaña fija de la barra superior para que esté siempre accesible.
