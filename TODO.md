@@ -12,4 +12,4 @@ Interfaz
 - [x] Pantalla de acusación y pantalla de resultado con botón de nueva partida.
 - [x] Revisar que todo se lee bien en pantalla de móvil en vertical.
 Publicación
-[ ] Configurar GitHub Pages (workflow o instrucciones en README.md) y comprobar que los criterios de "terminado" de SPEC.md se cumplen.
+- [x] Configurar GitHub Pages (workflow o instrucciones en README.md) y comprobar que los criterios de "terminado" de SPEC.md se cumplen.
